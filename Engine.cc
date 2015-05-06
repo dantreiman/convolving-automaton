@@ -1,9 +1,9 @@
 #include "Engine.h"
 
 #include <GLFW/glfw3.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cmath>
+#include <iostream>
+#include <cstdlib>
 
 namespace ca {
 
@@ -36,10 +36,13 @@ void Engine::Init() {
     }
     if (monitor_) {
         glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	}
+    }
     glfwMakeContextCurrent(window_);
     glfwSwapInterval(1);
-    // glfwSetWindowSizeCallback(window, resize_callback);
+    glfwSetWindowSizeCallback(window_, [] (GLFWwindow* window, int width, int height) {
+        glViewport(0, 0, width, height);
+        //aspect_ratio = height ? width / (float) height : 1.f;
+    });
     // glfwSetKeyCallback(window, key_callback);
 
     // Set initial aspect ratio
@@ -56,7 +59,7 @@ void Engine::RunLoop() {
         glfwPollEvents();
     }
 
-	// thrd_join(physics_thread, NULL);
+    // thrd_join(physics_thread, NULL);
 
     glfwDestroyWindow(window_);
     glfwTerminate();

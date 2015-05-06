@@ -1,4 +1,4 @@
-CC = /usr/bin/cc
+CC = /usr/bin/c++
 
 SRCS =  main.cc \
 		Engine.cc \
@@ -6,7 +6,7 @@ SRCS =  main.cc \
 
 LINKER_FLAGS = -lc++
 LINKER_FLAGS_OSX = -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
-C_FLAGS = -I glfw-3.1.1/include
+C_FLAGS = -std=c++11 -I glfw-3.1.1/include
 
 all:
 	$(CC) $(SRCS) $(C_FLAGS) $(LINKER_FLAGS) $(LINKER_FLAGS_OSX) -o convolving_automaton
