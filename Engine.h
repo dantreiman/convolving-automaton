@@ -15,11 +15,9 @@ class Engine {
   void RunLoop();
 
  private:
-  Size render_size_;
-  Size kernel_size_;
   GLFWwindow* window_;
   GLFWmonitor* monitor_;
-  Renderer renderer;
+  Renderer renderer_;
 };
 
 }  // namespace ca

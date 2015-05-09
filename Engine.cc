@@ -5,11 +5,13 @@
 #include <iostream>
 #include <cstdlib>
 
+using namespace std::placeholders;
+
 namespace ca {
 
-Engine::Engine() : window_(NULL), monitor_(NULL) {
-    render_size_.width = 512;
-    render_size_.height = 512;
+Engine::Engine() : window_(NULL),
+                   monitor_(NULL),
+                   renderer_(Size(512, 512)) {
 }
 
 void Engine::Init() {
@@ -18,7 +20,7 @@ void Engine::Init() {
         fprintf(stderr, "Failed to initialize GLFW\n");
         exit(EXIT_FAILURE);
     }
-	float width = 2880, height = 1800;
+    int width = 2880, height = 1800;
     monitor_ = glfwGetPrimaryMonitor();
     if (monitor_) {
         const GLFWvidmode* mode = glfwGetVideoMode(monitor_);
@@ -41,35 +43,34 @@ void Engine::Init() {
     glfwMakeContextCurrent(window_);
     glfwSwapInterval(1);
     glfwSetWindowSizeCallback(window_, [] (GLFWwindow* window, int width, int height) {
-        glViewport(0, 0, width, height);
-        //aspect_ratio = height ? width / (float) height : 1.f;
+		// TODO: figure out how to bind callback properly
+        // renderer_.Resize(width, height);
     });
-	
-	glfwSetKeyCallback(window_, [] (GLFWwindow* window, int key, int scancode, int action, int mods) {
-		if (action == GLFW_PRESS)
-	    {
-	        switch (key)
-	        {
-	            case GLFW_KEY_ESCAPE:
-				case GLFW_KEY_Q:
-	                glfwSetWindowShouldClose(window, GL_TRUE);
-	                break;
-	            default:
-	                break;
-	        }
-	    }
-	});
+    glfwSetKeyCallback(window_, [] (GLFWwindow* window, int key, int scancode, int action, int mods) {
+        if (action == GLFW_PRESS)
+        {
+            switch (key)
+            {
+                case GLFW_KEY_ESCAPE:
+                case GLFW_KEY_Q:
+                    glfwSetWindowShouldClose(window, GL_TRUE);
+                    break;
+                default:
+                    break;
+            }
+        }
+    });
     
     // Set initial aspect ratio
-    // glfwGetWindowSize(window, &width, &height);
-    // resize_callback(window, width, height);
+    glfwGetWindowSize(window_, &width, &height);
+    renderer_.Resize(width, height);
 }
 
 void Engine::RunLoop() {
     srand ((unsigned)glfwGetTime());
 
     while (!glfwWindowShouldClose(window_)) {
-        renderer.DrawScene(window_, glfwGetTime());
+        renderer_.DrawScene(window_, glfwGetTime());
         glfwSwapBuffers(window_);
         glfwPollEvents();
     }
