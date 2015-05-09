@@ -3,13 +3,13 @@
 
 #include <GLFW/glfw3.h>
 #include "utils.h"
+#include "Renderer.h"
 
 namespace ca {
 
 class Engine {
  public:
   Engine();
-  virtual ~Engine();
   void Init();
   
   void RunLoop();
@@ -18,7 +18,8 @@ class Engine {
   Size render_size_;
   Size kernel_size_;
   GLFWwindow* window_;
-  GLFWmonitor* monitor_;  
+  GLFWmonitor* monitor_;
+  Renderer renderer;
 };
 
 }  // namespace ca

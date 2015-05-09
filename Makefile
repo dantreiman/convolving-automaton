@@ -2,6 +2,7 @@ CC = /usr/bin/c++
 
 SRCS =  main.cc \
 		Engine.cc \
+		Renderer.cc \
 		glfw-3.1.1/build/src/libglfw3.a
 
 LINKER_FLAGS = -lc++
