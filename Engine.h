@@ -9,7 +9,11 @@ namespace ca {
 
 class Engine {
  public:
-  Engine();
+  /**
+   * Construct a simulation and renderer for the specified world dimensions.
+   * world_size must have power-of-two dimensions.
+   */
+  Engine(const Size& world_size);
   void Init();
   
   void RunLoop();

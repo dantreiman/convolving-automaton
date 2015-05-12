@@ -9,7 +9,7 @@ namespace ca {
 
 class Renderer {
  public:
-  Renderer(Size rtt_size);
+  Renderer(const Size& rtt_size);
   
   void RandomRects(GLFWwindow* window, float length, int iter);
 

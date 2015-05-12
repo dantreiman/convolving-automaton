@@ -9,9 +9,9 @@ using namespace std::placeholders;
 
 namespace ca {
 
-Engine::Engine() : window_(NULL),
-                   monitor_(NULL),
-                   renderer_(Size(512, 512)) {
+Engine::Engine(const Size& world_size) : window_(NULL),
+                                         monitor_(NULL),
+                                         renderer_(world_size) {
 }
 
 void Engine::Init() {

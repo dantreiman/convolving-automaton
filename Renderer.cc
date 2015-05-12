@@ -2,8 +2,8 @@
 
 namespace ca {
 
-Renderer::Renderer(Size rtt_size) : aspect_ratio_(1),
-                                    rtt_size_(rtt_size) {}
+Renderer::Renderer(const Size& rtt_size) : aspect_ratio_(1),
+                                           rtt_size_(rtt_size) {}
 
 void Renderer::RandomRects(GLFWwindow* window, float length, int iter) {
     std::uniform_int_distribution<int> x_dist(0, rtt_size_.w);
