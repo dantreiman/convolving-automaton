@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include "utils.h"
 #include "Renderer.h"
+#include "Simulation.h"
 
 namespace ca {
 
@@ -21,6 +22,7 @@ class Engine {
  private:
   GLFWwindow* window_;
   GLFWmonitor* monitor_;
+  Simulation simulation_;
   Renderer renderer_;
 };
 

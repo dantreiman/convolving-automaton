@@ -11,6 +11,11 @@ class Renderer {
  public:
   Renderer(const Size& rtt_size);
   
+  /**
+   * Configure gl state.
+   */
+  void Init();
+
   void RandomRects(GLFWwindow* window, float length, int iter);
 
   void DrawScene(GLFWwindow* window, double t);

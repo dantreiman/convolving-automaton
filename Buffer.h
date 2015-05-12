@@ -25,12 +25,12 @@ template <typename T> class Buffer2D {
 };
 
 template <typename T> Buffer2D<T>::Buffer2D(Size s) : size_(s) {
-    data_ = calloc(s.w * s.h, sizeof(T));
+    data_ = static_cast<T*>(calloc(s.w * s.h, sizeof(T)));
 }
 
 template <typename T> Buffer2D<T>::Buffer2D(Buffer2D<T>& other) : size_(other.size()) {
 	const size_t mem_size = size_.w * size_.h * sizeof(T);
-	data_ = malloc(mem_size);
+	data_ = static_cast<T*>(malloc(mem_size));
 	memcpy(data_, other.data(), mem_size);
 }
 

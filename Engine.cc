@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <cstdlib>
+#include "log.h"
 
 using namespace std::placeholders;
 
@@ -11,6 +12,7 @@ namespace ca {
 
 Engine::Engine(const Size& world_size) : window_(NULL),
                                          monitor_(NULL),
+                                         simulation_(world_size),
                                          renderer_(world_size) {
 }
 
@@ -43,8 +45,9 @@ void Engine::Init() {
     glfwMakeContextCurrent(window_);
     glfwSwapInterval(1);
     glfwSetWindowSizeCallback(window_, [] (GLFWwindow* window, int width, int height) {
-		// TODO: figure out how to bind callback properly
+        // TODO: figure out how to bind callback properly
         // renderer_.Resize(width, height);
+        glViewport(0, 0, width, height);
     });
     glfwSetKeyCallback(window_, [] (GLFWwindow* window, int key, int scancode, int action, int mods) {
         if (action == GLFW_PRESS)
@@ -61,16 +64,23 @@ void Engine::Init() {
         }
     });
     
+    renderer_.Init();
     // Set initial aspect ratio
     glfwGetWindowSize(window_, &width, &height);
     renderer_.Resize(width, height);
+
+    // Set up simulation
+    simulation_.Init();
 }
 
 void Engine::RunLoop() {
     srand ((unsigned)glfwGetTime());
 
     while (!glfwWindowShouldClose(window_)) {
+		glBindTexture (GL_TEXTURE_2D, simulation_.inner_kernel_tex());
+		CHECK_GL_ERROR("glBindTexture");
         renderer_.DrawScene(window_, glfwGetTime());
+		CHECK_GL_ERROR("DrawScene");
         glfwSwapBuffers(window_);
         glfwPollEvents();
     }
