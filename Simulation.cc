@@ -17,8 +17,11 @@ void Simulation::Init() {
 	float inner_sum = CircularKernel(&inner_kernel, 20, 1);
 	glBindTexture (GL_TEXTURE_2D, inner_kernel_tex_);
 	CHECK_GL_ERROR("glBindTexture");
-	glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, world_size_.w, world_size_.h, GL_RED, GL_FLOAT, inner_kernel.data());
-	CHECK_GL_ERROR("glTexSubImage2D");
+	// glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, world_size_.w, world_size_.h, GL_RED, GL_FLOAT, inner_kernel.data());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA,
+	             world_size_.w, world_size_.h,
+				0, GL_ALPHA, GL_FLOAT, inner_kernel.data());
+	CHECK_GL_ERROR("glTexImage2D");
 }
 
 }  // namespace ca

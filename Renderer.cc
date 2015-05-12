@@ -8,9 +8,9 @@ Renderer::Renderer(const Size& rtt_size) : aspect_ratio_(1),
                                            rtt_size_(rtt_size) {}
 
 void Renderer::Init() {
-	glDisable(GL_DEPTH_TEST);
-	glEnable (GL_CULL_FACE);
-	glEnable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
+    glEnable (GL_CULL_FACE);
+    glEnable(GL_TEXTURE_2D);
 }
 
 void Renderer::RandomRects(GLFWwindow* window, float length, int iter) {
@@ -46,7 +46,7 @@ void Renderer::DrawScene(GLFWwindow* window, double t) {
     glLoadIdentity();
 
     glBegin(GL_QUADS);
-	glTexCoord2i(0,0); glVertex2i(0, 0);
+    glTexCoord2i(0,0); glVertex2i(0, 0);
     glTexCoord2i(1, 0); glVertex2i(rtt_size_.w, 0);
     glTexCoord2i(1, 1); glVertex2i(rtt_size_.w, rtt_size_.h);
     glTexCoord2i(0, 1); glVertex2i(0, rtt_size_.h);
