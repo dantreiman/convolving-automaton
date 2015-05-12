@@ -15,7 +15,7 @@ template <typename T> class Buffer2D {
     ~Buffer2D();
 
     const T& get(int x, int y);
-    void set(int x, int y, T& value);
+    void set(int x, int y, const T& value);
 
     const Size& size();
     T* data();
@@ -43,7 +43,7 @@ template <typename T> const T& Buffer2D<T>::get(int x, int y) {
 	return data_[x + (y * size_.w)];
 }
 
-template <typename T> void Buffer2D<T>::set(int x, int y, T& value) {
+template <typename T> void Buffer2D<T>::set(int x, int y, const T& value) {
 	// TODO: check that x < size_.w, y < size_.h
 	data_[x + (y * size_.w)] = value;
 }
