@@ -34,6 +34,25 @@ float CircularKernel(Buffer2D<float> *buffer,
     return sum;
 }
 
+float RingKernel(Buffer2D<float> * buffer,
+                float inner_radius,
+                float outer_radius,
+                float border) {
+    const Size& size = buffer->size();
+    const int tx = size.w / 2;
+    const int ty = size.h / 2;
+    float sum = 0;
+    for (int y = 0; y < size.h; y++) {
+        for (int x = 0; x < size.w; x++) {
+            const float d = hypotf(x - tx, y - ty);
+            const float value = func_linear(d, inner_radius, border) * (1 - func_linear(d, outer_radius, border));
+            buffer->set(x, y, value);
+            sum += value;
+        }
+    }
+    return sum;
+}
+
 
 // n = func_kernel (d, ri, border) * ( 1 - func_kernel(l, ra, border));
 

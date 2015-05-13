@@ -14,7 +14,8 @@ void Simulation::Init() {
 	glGenTextures (1, &inner_kernel_tex_);
 	CHECK_GL_ERROR("glGenTextures");
 	Buffer2D<float> inner_kernel(world_size_);
-	float inner_sum = CircularKernel(&inner_kernel, 20, 1);
+	// float inner_sum = CircularKernel(&inner_kernel, 20, 1);
+	float inner_sum = RingKernel(&inner_kernel, 7, 20, 1);
 	glBindTexture(GL_TEXTURE_2D, inner_kernel_tex_);
 	
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
