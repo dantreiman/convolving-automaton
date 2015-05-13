@@ -2,6 +2,7 @@ CC = /usr/bin/c++
 
 SRCS =  main.cc \
 		Engine.cc \
+		FFT.cc \
 		Kernel.cc \
 		Renderer.cc \
 		Simulation.cc \
