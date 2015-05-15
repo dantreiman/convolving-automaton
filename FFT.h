@@ -1,5 +1,10 @@
 #ifndef CONVOLVING_AUTOMATON_FFT_H_
 #define CONVOLVING_AUTOMATON_FFT_H_
+//
+//  Performs parallel FFT using RGBA textures. 
+//  Can do 2 DFTs at once in parallel.
+//  Input and output expects 2 planes: R + Gi, B + Ai
+//
 
 #include <GLFW/glfw3.h>
 #include <memory>
