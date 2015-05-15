@@ -1,6 +1,7 @@
 #include "Simulation.h"
 
 #include "Buffer.h"
+#include "FFT.h"
 #include "Kernel.h"
 #include "log.h"
 
@@ -31,6 +32,11 @@ void Simulation::Init() {
 	             world_size_.w, world_size_.h,
 				0, GL_RED, GL_FLOAT, inner_kernel.data());
 	CHECK_GL_ERROR("glTexImage2D");
+	
+	// Just to test, create an FFT
+	FFT * fft = new FFT(world_size_);
+	fft->Init();
+	std::cout << "Initialized FFT" << std::endl;
 }
 
 }  // namespace ca

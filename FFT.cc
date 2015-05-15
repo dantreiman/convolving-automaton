@@ -35,6 +35,7 @@ FFT::FFT(const Size& size) : size_(size) {
 void FFT::Init() {
     GeneratePlanX();
     GeneratePlanY();
+    LoadShader();
 }
 
 
@@ -201,6 +202,11 @@ void FFT::GeneratePlanY() {
         }
     }
     free (p);
+}
+
+void FFT::LoadShader() {
+    Shader * shader = new Shader("fft2D");
+    shader_.reset(shader);
 }
 
 

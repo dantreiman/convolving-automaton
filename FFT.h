@@ -1,11 +1,12 @@
 #ifndef CONVOLVING_AUTOMATON_FFT_H_
 #define CONVOLVING_AUTOMATON_FFT_H_
 
-#include <complex>
 #include <GLFW/glfw3.h>
-#include "Buffer.h"
+#include <memory>
+#include "Shader.h"
+#include "utils.h"
 
-#define MP2 20
+#define MP2 14  // The maximum power-of-two size allowed for buffers
 
 namespace ca {
 
@@ -15,18 +16,28 @@ class FFT {
      * Size must be a power of 2.
      */
     FFT(const Size& size);
-
     void Init();
+
+    /**
+     * Fourier transform a texture.
+     * Actually, performs 2 fourier transforms in parallel.
+     * src must be RGBA, where R is the real 
+     */
+	void forward(GLuint src, GLuint dst);
+	
+	void inverse(GLuint src, GLuint dst);
 
   private:
     void GeneratePlanTextures();
     void GeneratePlanX();
     void GeneratePlanY();
-    
+	void LoadShader();
+	
     Size size_;
     int log2x_;
     int log2y_;
     GLuint planx[MP2][2], plany[MP2][2];
+	std::unique_ptr<Shader> shader_;
 };
 
 }

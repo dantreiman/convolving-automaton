@@ -6,6 +6,7 @@ SRCS =  main.cc \
 		Kernel.cc \
 		Renderer.cc \
 		Simulation.cc \
+		Shader.cc \
 		glfw-3.1.1/build/src/libglfw3.a
 
 LINKER_FLAGS = -lc++
