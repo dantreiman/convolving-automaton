@@ -13,11 +13,10 @@ class Simulation {
   void Init();
   
   // temp
-  GLuint inner_kernel_tex() { return inner_kernel_tex_; }
+  GLuint kernel_tex() { return kernel_tex_; }
  private:
   Size world_size_;
-  GLuint inner_kernel_tex_;
-  GLuint outer_kernel_tex_;
+  GLuint kernel_tex_; // 2 kernels interleaved into 1 texture
 };
 
 }  // namespace ca

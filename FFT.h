@@ -26,7 +26,8 @@ class FFT {
     /**
      * Fourier transform a texture.
      * Actually, performs 2 fourier transforms in parallel.
-     * src must be RGBA, where R is the real 
+     * src must be RGBA, 1st plane (R + Gi)
+     * 2nd plane (B + Ai)
      */
 	void forward(GLuint src, GLuint dst);
 	
@@ -42,6 +43,7 @@ class FFT {
     int log2x_;
     int log2y_;
     GLuint planx[MP2][2], plany[MP2][2];
+	GLuint fft1, fft0; // Intermediate buffers
 	std::unique_ptr<Shader> shader_;
 };
 

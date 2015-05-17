@@ -1,6 +1,7 @@
 #ifndef CONVOLVING_AUTOMATON_BUFFER_H_
 #define CONVOLVING_AUTOMATON_BUFFER_H_
-// Represents a 2-dimensional buffer of values
+//
+// Represents a 2-dimensional contiguous array of values, like a bitmap
 // 
 
 #include <cstdlib>

@@ -77,7 +77,7 @@ void Engine::RunLoop() {
     srand ((unsigned)glfwGetTime());
 
     while (!glfwWindowShouldClose(window_)) {
-		glBindTexture (GL_TEXTURE_2D, simulation_.inner_kernel_tex());
+		glBindTexture (GL_TEXTURE_2D, simulation_.kernel_tex());
 		CHECK_GL_ERROR("glBindTexture");
         renderer_.DrawScene(window_, glfwGetTime());
 		CHECK_GL_ERROR("DrawScene");
