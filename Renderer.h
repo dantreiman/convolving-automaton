@@ -3,6 +3,7 @@
 
 #include <random>
 #include "gl_includes.h"
+#include "Shader.h"
 #include "utils.h"
 
 namespace ca {
@@ -26,6 +27,8 @@ class Renderer {
 	float aspect_ratio_; // The aspect ratio of the render output device
 	Size rtt_size_;
 	std::default_random_engine generator_;
+	std::unique_ptr<Shader> draw_shader_;
+	GLuint vao_;
 };
 
 }  // namespace ca

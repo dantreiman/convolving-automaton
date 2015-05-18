@@ -67,13 +67,11 @@ FrameBuffer* FFT::Inverse(FrameBuffer* src) {
     FrameBuffer* temp2 = cache->ReserveBuffer();
     FrameBuffer* read = src;
     FrameBuffer* write = temp1;
-
     for (int t = 1; t <= log2y_; t++) {
         Stage(2, t, si, read, write);
         if (read == src) { read = temp2; } // Read from src on the 1st stage
         std::swap(read, write);
     }
-
     for (int t = 0; t <= log2x_-1; t++) {
         Stage(1, t, si, read, write);
         std::swap(read, write);
@@ -248,6 +246,7 @@ void FFT::GeneratePlanY() {
 
 void FFT::LoadShader() {
     Shader * shader = new Shader("fft2D_par");
+	shader->Init();
     shader_.reset(shader);
 }
 
