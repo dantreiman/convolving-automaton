@@ -6,8 +6,9 @@
 //  Input and output expects 2 planes: R + Gi, B + Ai
 //
 
-#include <GLFW/glfw3.h>
 #include <memory>
+#include "FrameBuffer.h"
+#include "gl_includes.h"
 #include "Shader.h"
 #include "utils.h"
 
@@ -29,22 +30,23 @@ class FFT {
      * src must be RGBA, 1st plane (R + Gi)
      * 2nd plane (B + Ai)
      */
-	void forward(GLuint src, GLuint dst);
-	
-	void inverse(GLuint src, GLuint dst);
+    FrameBuffer* Forward(FrameBuffer* src);
+    
+    FrameBuffer* Inverse(FrameBuffer* src);
 
   private:
     void GeneratePlanTextures();
     void GeneratePlanX();
     void GeneratePlanY();
-	void LoadShader();
-	
+    void LoadShader();
+    void Stage(int dim, int eb, int si, FrameBuffer* src, FrameBuffer* dst);
+    
     Size size_;
     int log2x_;
     int log2y_;
     GLuint planx[MP2][2], plany[MP2][2];
-	GLuint fft1, fft0; // Intermediate buffers
-	std::unique_ptr<Shader> shader_;
+    GLuint fft1, fft0; // Intermediate buffers
+    std::unique_ptr<Shader> shader_;
 };
 
 }

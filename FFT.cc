@@ -1,6 +1,8 @@
 #include "FFT.h"
 
+#include <algorithm>
 #include <cmath>
+#include "FrameBufferCache.h"
 #include "log.h"
 
 namespace {
@@ -38,68 +40,46 @@ void FFT::Init() {
     LoadShader();
 }
 
-void FFT::forward(GLuint src, GLuint dst) {
-	// int t, s;
-	// int fftcur, fftoth;
-	// 
-	// fftcur = FFT0;
-	// fftoth = FFT1;
-	// 
-	// if (si==-1)		// real to Fourier
-	// {
-	// 	copybufferrc (vo, fftcur);
-	// 
-	// 	for (t=1; t<=BX-1+1; t++)
-	// 	{
-	// 		if (dims==1 && t==BX) fft_stage (1, t, si, fftcur, na);
-	// 		else fft_stage (1, t, si, fftcur, fftoth);
-	// 		s=fftcur; fftcur=fftoth; fftoth=s;
-	// 	}
-	// 
-	// 	for (t=1; t<=BY; t++)
-	// 	{
-	// 		if (dims==2 && t==BY) fft_stage (2, t, si, fftcur, na);
-	// 		else fft_stage (2, t, si, fftcur, fftoth);
-	// 		s=fftcur; fftcur=fftoth; fftoth=s;
-	// 	}
-	// 
-	// 	for (t=1; t<=BZ; t++)
-	// 	{
-	// 		if (t==BZ) fft_stage (3, t, si, fftcur, na);
-	// 		else fft_stage (3, t, si, fftcur, fftoth);
-	// 		s=fftcur; fftcur=fftoth; fftoth=s;
-	// 	}
-	// }
-	// else	// si==1, Fourier to real
-	// {
-	// 	for (t=1; t<=BZ; t++)
-	// 	{
-	// 		if (t==1) fft_stage (3, t, si, vo, fftoth);
-	// 		else fft_stage (3, t, si, fftcur, fftoth);
-	// 		s=fftcur; fftcur=fftoth; fftoth=s;
-	// 	}
-	// 
-	// 	for (t=1; t<=BY; t++)
-	// 	{
-	// 		if (dims==2 && t==1) fft_stage (2, t, si, vo, fftoth);
-	// 		else fft_stage (2, t, si, fftcur, fftoth);
-	// 		s=fftcur; fftcur=fftoth; fftoth=s;
-	// 	}
-	// 
-	// 	for (t=0; t<=BX-1; t++)
-	// 	{
-	// 		if (dims==1 && t==0) fft_stage (1, t, si, vo, fftoth);
-	// 		else fft_stage (1, t, si, fftcur, fftoth);
-	// 		s=fftcur; fftcur=fftoth; fftoth=s;
-	// 	}
-	// 
-	// 	copybuffercr (fftcur, na);
-	// }
-	// 
+FrameBuffer* FFT::Forward(FrameBuffer* src) {
+    const int si = -1; // -1 forward, 1 inverse
+    FrameBufferCache * cache = FrameBufferCache::sharedCache(size_);
+    FrameBuffer* temp1 = cache->ReserveBuffer();
+    FrameBuffer* temp2 = cache->ReserveBuffer();
+    FrameBuffer* read = src;
+    FrameBuffer* write = temp1;
+    for (int t = 1; t <= log2x_; t++) {
+        Stage(1, t, si, read, write);
+        if (read == src) { read = temp2; } // Read from src on the 1st stage
+        std::swap(read, write);
+    }
+    for (int t = 1; t <= log2y_; t++) {
+        Stage(2, t, si, read, write);
+        std::swap(read, write);
+    }
+    cache->RecycleBuffer(read);
+    return write;
 }
 
-void FFT::inverse(GLuint src, GLuint dst) {
-	
+FrameBuffer* FFT::Inverse(FrameBuffer* src) {
+    const int si = 1; // -1 forward, 1 inverse
+    FrameBufferCache * cache = FrameBufferCache::sharedCache(size_);
+    FrameBuffer* temp1 = cache->ReserveBuffer();
+    FrameBuffer* temp2 = cache->ReserveBuffer();
+    FrameBuffer* read = src;
+    FrameBuffer* write = temp1;
+
+    for (int t = 1; t <= log2y_; t++) {
+        Stage(2, t, si, read, write);
+        if (read == src) { read = temp2; } // Read from src on the 1st stage
+        std::swap(read, write);
+    }
+
+    for (int t = 0; t <= log2x_-1; t++) {
+        Stage(1, t, si, read, write);
+        std::swap(read, write);
+    }
+    cache->RecycleBuffer(read);
+    return write;
 }
 
 void FFT::GeneratePlanTextures() {
