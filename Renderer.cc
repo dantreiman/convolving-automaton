@@ -1,5 +1,6 @@
 #include "Renderer.h"
 
+#include "gl_includes.h"
 #include "log.h"
 
 namespace ca {
@@ -16,7 +17,8 @@ void Renderer::Init() {
 void Renderer::RandomRects(GLFWwindow* window, float length, int iter) {
     std::uniform_int_distribution<int> x_dist(0, rtt_size_.w);
     std::uniform_int_distribution<int> y_dist(0, rtt_size_.h);
-    std::uniform_int_distribution<int> r_dist(length * .5, length * 1.5);
+    std::uniform_int_distribution<int> r_dist(length * .5, length * 1
+.5);
     
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glBegin(GL_QUADS);

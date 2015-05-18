@@ -1,6 +1,5 @@
 #include "Engine.h"
 
-#include <GLFW/glfw3.h>
 #include <cmath>
 #include <iostream>
 #include <cstdlib>

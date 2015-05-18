@@ -1,14 +1,14 @@
 #ifndef CONVOLVING_AUTOMATON_FRAMEBUFFER_H_
 #define CONVOLVING_AUTOMATON_FRAMEBUFFER_H_
 
-#include <GLFW/glfw3.h>
+#include "gl_includes.h"
 
 namespace ca {
 
 class FrameBuffer {
  public:
 	FrameBuffer(GLuint texture, GLuint framebuffer);
-		
+	
  private:
 	GLuint texture_;
 	GLuint framebuffer_;

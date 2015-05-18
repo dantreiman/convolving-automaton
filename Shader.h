@@ -1,8 +1,8 @@
 #ifndef CONVOLVING_AUTOMATON_SHADER_H_
 #define CONVOLVING_AUTOMATON_SHADER_H_
 
-#include <GLFW/glfw3.h>
 #include <string>
+#include "gl_includes.h"
 
 namespace ca {
 

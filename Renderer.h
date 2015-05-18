@@ -1,8 +1,8 @@
 #ifndef CONVOLVING_AUTOMATON_RENDERER_H_
 #define CONVOLVING_AUTOMATON_RENDERER_H_
 
-#include <GLFW/glfw3.h>
 #include <random>
+#include "gl_includes.h"
 #include "utils.h"
 
 namespace ca {

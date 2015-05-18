@@ -1,6 +1,6 @@
 namespace ca {
 
-template <typename T> struct Vec4 {
+template <typename T=float> struct Vec4 {
 	Vec4() : x(0), y(0), z(0), k(0) {}
 	
 	Vec4(const T& x, const T& y, const T& z, const T& k) :

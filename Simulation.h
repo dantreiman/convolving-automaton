@@ -1,7 +1,7 @@
 #ifndef CONVOLVING_AUTOMATON_SIMULATION_H_
 #define CONVOLVING_AUTOMATON_SIMULATION_H_
 
-#include <GLFW/glfw3.h>
+#include "gl_includes.h"
 #include "utils.h"
 #include "Renderer.h"
 

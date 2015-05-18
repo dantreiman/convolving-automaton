@@ -6,7 +6,9 @@
 // Thread-safe singleton.
 //
 
-#include <GLFW/glfw3.h>
+#include <vector>
+#include "FrameBuffer.h"
+#include "gl_includes.h"
 #include "utils.h"
 
 namespace ca {
@@ -17,7 +19,7 @@ class FrameBufferCache {
   /**
    * Shared buffer cache.
    */
-  static FrameBufferCache* sharedCache()
+    static FrameBufferCache* sharedCache(const Size& rtt_size);
 
   /**
    * Initialize the cache using the specified size and count;
@@ -29,10 +31,10 @@ class FrameBufferCache {
   void RecycleBuffer(FrameBuffer * buffer);
 
  private:
-	GenerateBuffers(int count);
-	
-	vector<FrameBuffer *> buffers_;
-	Size rtt_size_;
+    void GenerateBuffers(int count);
+    
+    std::vector<FrameBuffer *> buffers_;
+    Size rtt_size_;
 };
 
 }  // namespace ca

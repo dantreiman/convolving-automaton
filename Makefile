@@ -3,6 +3,8 @@ CC = /usr/bin/c++
 SRCS =  main.cc \
 		Engine.cc \
 		FFT.cc \
+		FrameBuffer.cc \
+		FrameBufferCache.cc \
 		Kernel.cc \
 		Renderer.cc \
 		Simulation.cc \
