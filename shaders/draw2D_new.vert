@@ -4,6 +4,6 @@ out vec2 varTexcoord;
 
 void main()
 {
-	gl_Position = position;
-	varTexcoord = position;
+    gl_Position = position;
+    varTexcoord = position;
 }

@@ -251,4 +251,8 @@ void FFT::LoadShader() {
 }
 
 
+void FFT::Stage(int dim, int eb, int si, FrameBuffer* src, FrameBuffer* dst) {
+	
+}
+
 }  // namespace ca

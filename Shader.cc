@@ -62,20 +62,16 @@ const GLuint Shader::program() {
 }
 
 bool Shader::Load() {
-    std::string vert_path = "shaders\\" + name_ + ".vert";
+    std::string vert_path = "shaders/" + name_ + ".vert";
     std::ifstream vert_file(vert_path);
-    std::stringstream vert_string;
-    vert_string << vert_file.rdbuf();
-    vert_src_ = vert_string.str();
+    vert_src_ = std::string((std::istreambuf_iterator<char>(vert_file)), std::istreambuf_iterator<char>());
     vertex_shader_ = glCreateShader (GL_VERTEX_SHADER);
     const char * vert_src_cstring = vert_src_.c_str();
     glShaderSource(vertex_shader_, 1, &vert_src_cstring, NULL);
     
-    std::string frag_path = "shaders\\" + name_ + ".frag";
+    std::string frag_path = "shaders/" + name_ + ".frag";
     std::ifstream frag_file(frag_path);
-    std::stringstream frag_string;
-    frag_string << frag_file.rdbuf();
-    frag_src_ = frag_string.str();
+    frag_src_ = std::string((std::istreambuf_iterator<char>(frag_file)), std::istreambuf_iterator<char>());
     fragment_shader_ = glCreateShader (GL_FRAGMENT_SHADER);
     const char * frag_src_cstring = frag_src_.c_str();
     glShaderSource(fragment_shader_, 1, &frag_src_cstring, NULL);
@@ -111,10 +107,12 @@ bool Shader::Compile() {
     glLinkProgram(program_);
     if (printProgramInfoLog(program_)) {
         fprintf(LOGFILE, "shader linking failed!\n\n");
+		fprintf(LOGFILE, "Vertex Shader:\n%s", vert_src_.c_str());
+		fprintf(LOGFILE, "Fragment Shader:\n%s", frag_src_.c_str());
         result &= false;
     }
     else {
-        fprintf(LOGFILE, "shader program ok\n\n");
+        fprintf(LOGFILE, "shader program ok\n\n");		
     }
     return result;
 }

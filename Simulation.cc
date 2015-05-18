@@ -46,9 +46,9 @@ void Simulation::Init() {
     CHECK_GL_ERROR("glTexImage2D");
     
     // Just to test, create an FFT
-    FFT * fft = new FFT(world_size_);
-    fft->Init();
-    std::cout << "Initialized FFT" << std::endl;
+    // FFT * fft = new FFT(world_size_);
+    // fft->Init();
+    // std::cout << "Initialized FFT" << std::endl;
 }
 
 }  // namespace ca

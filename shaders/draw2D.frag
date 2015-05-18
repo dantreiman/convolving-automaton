@@ -29,7 +29,6 @@ vec3 rainbowph (float f, float ph)
 	return 0.5*sin(1.7*cos(pi*(f+vec3(0,1,2)/3.0+ph)))+0.5;
 }
 
-
 vec3 color (float f)
 {
 	//     if (colscheme==1.0) return vec3(f,.0,.0);		// red on black

@@ -79,7 +79,6 @@ void Engine::RunLoop() {
 		glBindTexture (GL_TEXTURE_2D, simulation_.kernel_tex());
 		CHECK_GL_ERROR("glBindTexture");
         renderer_.DrawScene(window_, glfwGetTime());
-		CHECK_GL_ERROR("DrawScene");
         glfwSwapBuffers(window_);
         glfwPollEvents();
     }

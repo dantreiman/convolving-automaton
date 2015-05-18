@@ -46,7 +46,7 @@ Renderer::Renderer(const Size& rtt_size) : aspect_ratio_(1),
 
 void Renderer::Init() {
 	// Load default shader
-    Shader * draw_shader = new Shader("draw2D");
+    Shader * draw_shader = new Shader("draw2D_new");
 	draw_shader->Init();
     draw_shader_.reset(draw_shader);
 	// Set up default settings
@@ -73,28 +73,27 @@ void Renderer::Init() {
 }
 
 void Renderer::RandomRects(GLFWwindow* window, float length, int iter) {
-	glEnableClientState(GL_VERTEX_ARRAY);
-    std::uniform_int_distribution<int> x_dist(0, rtt_size_.w);
-    std::uniform_int_distribution<int> y_dist(0, rtt_size_.h);
-    std::uniform_int_distribution<int> r_dist(length * .5, length * 1.5);
-    
-    // glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    for (int i = 0; i < iter; i++) {
-        float x = x_dist(generator_);
-        float y = y_dist(generator_);
-        float w = r_dist(generator_);
-        float h = r_dist(generator_);
-		Quad quad(x, y, w, h);
-		glVertexPointer(2, GL_INT, 0, quad.vertices);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 2);
-    }
-	glDisableClientState(GL_VERTEX_ARRAY);
+	// glEnableClientState(GL_VERTEX_ARRAY);
+	//     std::uniform_int_distribution<int> x_dist(0, rtt_size_.w);
+	//     std::uniform_int_distribution<int> y_dist(0, rtt_size_.h);
+	//     std::uniform_int_distribution<int> r_dist(length * .5, length * 1.5);
+	//     
+	//     // glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	//     for (int i = 0; i < iter; i++) {
+	//         float x = x_dist(generator_);
+	//         float y = y_dist(generator_);
+	//         float w = r_dist(generator_);
+	//         float h = r_dist(generator_);
+	// 	Quad quad(x, y, w, h);
+	// 	glVertexPointer(2, GL_INT, 0, quad.vertices);
+	// 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 2);
+	//     }
+	// glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void Renderer::DrawScene(GLFWwindow* window, double t) {
     glClearColor(0.1f, 0.1f, 0.1f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     // glMatrixMode(GL_PROJECTION);
     // glLoadIdentity();
     // glOrtho(0, rtt_size_.w, 0, rtt_size_.h, -1, 1);
@@ -109,7 +108,14 @@ void Renderer::DrawScene(GLFWwindow* window, double t) {
     // glTexCoord2i(1, 1); glVertex2i(rtt_size_.w, rtt_size_.h);
     // glTexCoord2i(0, 1); glVertex2i(0, rtt_size_.h);
     // glEnd();
-    RandomRects(window, 20, 100);
+	glUseProgram(draw_shader_->program());
+	CHECK_GL_ERROR("glUseProgram");
+	glBindVertexArray(vao_);
+	CHECK_GL_ERROR("glBindVertexArray");
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 2);
+	CHECK_GL_ERROR("glDrawArrays");
+	
+    //RandomRects(window, 20, 100);
 }
 
 void Renderer::Resize(int width, int height) {
