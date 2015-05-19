@@ -1,7 +1,4 @@
-// SmoothLife
-//
-// 2D draw and color
-//
+#version 140
 
 in vec2      varTexcoord;
 out vec4     fragColor;

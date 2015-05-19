@@ -21,6 +21,11 @@ void Engine::Init() {
         fprintf(stderr, "Failed to initialize GLFW\n");
         exit(EXIT_FAILURE);
     }
+	// Use OpenGL version 3.2
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     int width = 2880, height = 1800;
     monitor_ = glfwGetPrimaryMonitor();
     if (monitor_) {
@@ -76,8 +81,8 @@ void Engine::RunLoop() {
     srand ((unsigned)glfwGetTime());
 
     while (!glfwWindowShouldClose(window_)) {
-		glBindTexture (GL_TEXTURE_2D, simulation_.kernel_tex());
-		CHECK_GL_ERROR("glBindTexture");
+        glBindTexture (GL_TEXTURE_2D, simulation_.kernel_tex());
+        CHECK_GL_ERROR("glBindTexture");
         renderer_.DrawScene(window_, glfwGetTime());
         glfwSwapBuffers(window_);
         glfwPollEvents();
