@@ -6,30 +6,12 @@
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 namespace ca {
+
 namespace {
 
 // Attribute indexes
 enum {
     POS_ATTRIB_IDX,
-};
-
-
-struct Quad {
-    Quad(const Size& size) {
-        vertices[0] = Vertex(size.w, 0);
-        vertices[1] = Vertex(size.w, size.h);
-        vertices[2] = Vertex(0, 0);
-        vertices[3] = Vertex(0, size.h);
-    }
-    
-    Quad(float x, float y, float w, float h) {
-        vertices[0] = Vertex(x + w, y);
-        vertices[1] = Vertex(x + w, y + h);
-        vertices[2] = Vertex(x, y);
-        vertices[3] = Vertex(x, y + h);
-    }
-
-    Vertex vertices[4];
 };
 
 }  // namespace
@@ -48,19 +30,20 @@ void Renderer::Init() {
     Shader * draw_shader = new Shader("draw2D_new");
     draw_shader->Init(ShaderAttributes(POS_ATTRIB_IDX, "position"));
     draw_shader_.reset(draw_shader);
-    uniform_stateTexture_ = draw_shader_->UniformLocation("stateTexture");
+    // uniform_stateTexture_ = draw_shader_->UniformLocation("stateTexture");
     // Set up default settings
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     // Create full screen rendering VBO
-    Quad quad = Quad(200, 200, 400, 400);
-    memcpy(&vertices_[0], &quad.vertices[0], 4 * sizeof(Vertex));
+    Quad quad = Quad(rtt_size_);
+    memcpy(&quad_.vertices[0], &quad.vertices[0], 4 * sizeof(Vertex));
+	std::cout << quad_.ToString();
     glGenVertexArrays(1, &vao_);
     glBindVertexArray(vao_);
     GLuint posBufferName;
     glGenBuffers(1, &posBufferName);
     glBindBuffer(GL_ARRAY_BUFFER, posBufferName);
-    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), &vertices_[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), &quad_.vertices[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(POS_ATTRIB_IDX);
     // Set up parmeters for position attribute in the VAO including, 
     // size, type, stride, and offset in the currenly bound VAO

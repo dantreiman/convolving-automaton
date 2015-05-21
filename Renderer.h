@@ -4,18 +4,11 @@
 #include <random>
 #include "FrameBuffer.h"
 #include "gl_includes.h"
+#include "Quad.h"
 #include "Shader.h"
 #include "utils.h"
 
 namespace ca {
-
-struct Vertex {
-    Vertex() : x(0), y(0) {}
-    Vertex(int x, int y) : x(x), y(y) {}
-    GLint x;
-    GLint y;
-};
-
 
 class Renderer {
  public:
@@ -33,15 +26,15 @@ class Renderer {
   void Resize(int width, int height);
 
  private:
-	float aspect_ratio_; // The aspect ratio of the render output device
-	Size rtt_size_;
-	GLuint default_framebuffer_;
-	Vertex vertices_[4];
-	std::default_random_engine generator_;
-	std::unique_ptr<Shader> draw_shader_;
-	GLuint vao_;
-	// uniform locations
-	GLint uniform_stateTexture_;
+    float aspect_ratio_; // The aspect ratio of the render output device
+    Size rtt_size_;
+    GLuint default_framebuffer_;
+    Quad quad_;
+    std::default_random_engine generator_;
+    std::unique_ptr<Shader> draw_shader_;
+    GLuint vao_;
+    // uniform locations
+    GLint uniform_stateTexture_;
 };
 
 }  // namespace ca
