@@ -13,7 +13,7 @@ namespace ca {
 Engine::Engine(const Size& world_size) : window_(NULL),
                                          monitor_(NULL),
                                          simulation_(world_size),
-                                         renderer_(world_size) {
+                                         renderer_(world_size, 0) {
 }
 
 void Engine::Init() {

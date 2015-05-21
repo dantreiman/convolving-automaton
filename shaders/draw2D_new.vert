@@ -1,8 +1,10 @@
-#version 330
+#version 330 core
 
 in vec2 position;
 
 void main()
 {
-    gl_Position = vec4(position.x, position.y, 0, 0);
+    gl_Position.xy = position.xy;
+    gl_Position.z = 0.0f;
+    gl_Position.w = 1.0f;
 }

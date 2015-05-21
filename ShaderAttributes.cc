@@ -18,9 +18,9 @@ void ShaderAttributes::AddAttribute(GLuint location, const std::string& name) {
 
 void ShaderAttributes::Bind(GLuint program) const {
     for (const AttributePair& attribute_pair : attributes_) {
-        const GLuint attribute_index = attribute_pair.first;
+        const GLuint attribute_location = attribute_pair.first;
         const std::string& attribute_name = attribute_pair.second;
-        glBindAttribLocation(program, attribute_index, attribute_name.c_str());
+        glBindAttribLocation(program, attribute_location, attribute_name.c_str());
         CHECK_GL_ERROR("glBindAttribLocation");
     }
 }

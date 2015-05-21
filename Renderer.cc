@@ -3,6 +3,8 @@
 #include "gl_includes.h"
 #include "log.h"
 
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+
 namespace ca {
 namespace {
 
@@ -11,13 +13,6 @@ enum {
     POS_ATTRIB_IDX,
 };
 
-
-struct Vertex {
-    Vertex() : x(0), y(0) {}
-    Vertex(int x, int y) : x(x), y(y) {}
-    GLint x;
-    GLint y;
-};
 
 struct Quad {
     Quad(const Size& size) {
@@ -40,40 +35,47 @@ struct Quad {
 }  // namespace
 
 
-Renderer::Renderer(const Size& rtt_size) : aspect_ratio_(1),
-                                           rtt_size_(rtt_size) {}
+Renderer::Renderer(const Size& rtt_size, GLuint default_framebuffer) :
+	aspect_ratio_(1),
+    rtt_size_(rtt_size),
+	default_framebuffer_(default_framebuffer) {}
 
 void Renderer::Init() {
     fprintf(LOGFILE, "Configuring Renderer\n");
     fprintf(LOGFILE, "OpenGL Version: %s\n", glGetString(GL_VERSION));
     fprintf(LOGFILE, "OpenGL Shader Language: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-    // Load default shader
+ // Load default shader
     Shader * draw_shader = new Shader("draw2D_new");
     draw_shader->Init(ShaderAttributes(POS_ATTRIB_IDX, "position"));
     draw_shader_.reset(draw_shader);
     uniform_stateTexture_ = draw_shader_->UniformLocation("stateTexture");
     // Set up default settings
     glDisable(GL_DEPTH_TEST);
-    // glEnable (GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
     // Create full screen rendering VBO
-    Quad quad = Quad(rtt_size_);
-	q_ = quad;
+    Quad quad = Quad(200, 200, 400, 400);
+    memcpy(&vertices_[0], &quad.vertices[0], 4 * sizeof(Vertex));
     glGenVertexArrays(1, &vao_);
     glBindVertexArray(vao_);
     GLuint posBufferName;
     glGenBuffers(1, &posBufferName);
     glBindBuffer(GL_ARRAY_BUFFER, posBufferName);
-    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), &(q_.vertices[0]), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), &vertices_[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(POS_ATTRIB_IDX);
     // Set up parmeters for position attribute in the VAO including, 
     // size, type, stride, and offset in the currenly bound VAO
     // This also attaches the position VBO to the VAO
-    glVertexAttribPointer(POS_ATTRIB_IDX,  // What attibute index will this array feed in the vertex shader (see buildProgram)
-                          2,               // How many elements are there per position?
-                          GL_INT,          // What is the type of this data?
-                          GL_FALSE,        // Do we want to normalize this data (0-1 range for fixed-point types)
-                          0,               // What is the stride (i.e. bytes between positions)?
-                          0);              // What is the offset in the VBO to the position data?
+    glVertexAttribIPointer(POS_ATTRIB_IDX,
+                           2,
+                           GL_INT,
+                           0,
+                           BUFFER_OFFSET(0));
+    // glVertexAttribPointer(POS_ATTRIB_IDX,  // What attibute index will this array feed in the vertex shader (see buildProgram)
+    //                       2,               // How many elements are there per position?
+    //                       GL_INT,          // What is the type of this data?
+    //                       GL_FALSE,        // Do we want to normalize this data (0-1 range for fixed-point types)
+    //                       0,               // What is the stride (i.e. bytes between positions)?
+    //                       BUFFER_OFFSET(0));              // What is the offset in the VBO to the position data?
 }
 
 void Renderer::RandomRects(GLFWwindow* window, float length, int iter) {
@@ -96,30 +98,24 @@ void Renderer::RandomRects(GLFWwindow* window, float length, int iter) {
 }
 
 void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
-    glClearColor(0.1f, 0.1f, 0.1f, 1.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // glMatrixMode(GL_PROJECTION);
-    // glLoadIdentity();
-    // glOrtho(0, rtt_size_.w, 0, rtt_size_.h, -1, 1);
-    // 
-    // // Setup camera
-    // glMatrixMode(GL_MODELVIEW);
-    // glLoadIdentity();
+	glBindFramebuffer(GL_FRAMEBUFFER, default_framebuffer_);
+    glClearColor(0.4f, 0.4f, 1.0f, 1.f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    CHECK_GL_ERROR("glClear");
 
-    // glBegin(GL_QUADS);
-    // glTexCoord2i(0,0); glVertex2i(0, 0);
-    // glTexCoord2i(1, 0); glVertex2i(rtt_size_.w, 0);
-    // glTexCoord2i(1, 1); glVertex2i(rtt_size_.w, rtt_size_.h);
-    // glTexCoord2i(0, 1); glVertex2i(0, rtt_size_.h);
-    // glEnd();
     glUseProgram(draw_shader_->program());
     CHECK_GL_ERROR("glUseProgram");
-    glBindVertexArray(vao_);
-    CHECK_GL_ERROR("glBindVertexArray");
-    glActiveTexture (GL_TEXTURE0);
     glBindTexture (GL_TEXTURE_2D, state->texture());
     CHECK_GL_ERROR("glBindTexture");
-    glDrawArrays(GL_TRIANGLES, 0, 4);
+    glEnableVertexAttribArray(POS_ATTRIB_IDX);
+    glBindVertexArray(vao_);
+    glVertexAttribIPointer(POS_ATTRIB_IDX,
+                           2,
+                           GL_INT,
+                           0,
+                           BUFFER_OFFSET(0));
+    CHECK_GL_ERROR("glBindVertexArray");
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     CHECK_GL_ERROR("glDrawArrays");
     
     //RandomRects(window, 20, 100);

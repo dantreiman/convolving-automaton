@@ -9,9 +9,17 @@
 
 namespace ca {
 
+struct Vertex {
+    Vertex() : x(0), y(0) {}
+    Vertex(int x, int y) : x(x), y(y) {}
+    GLint x;
+    GLint y;
+};
+
+
 class Renderer {
  public:
-  Renderer(const Size& rtt_size);
+  Renderer(const Size& rtt_size, GLuint default_framebuffer);
   
   /**
    * Configure gl state.
@@ -27,7 +35,8 @@ class Renderer {
  private:
 	float aspect_ratio_; // The aspect ratio of the render output device
 	Size rtt_size_;
-	Quad q_;
+	GLuint default_framebuffer_;
+	Vertex vertices_[4];
 	std::default_random_engine generator_;
 	std::unique_ptr<Shader> draw_shader_;
 	GLuint vao_;
