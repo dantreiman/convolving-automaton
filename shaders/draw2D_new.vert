@@ -8,5 +8,5 @@ void main()
     gl_Position.xy = position.xy;
     gl_Position.z = 0.0f;
     gl_Position.w = 1.0f;
-    texCoord = position.xy;
+    texCoord = (position.xy + 1.0) / 2.0;
 }

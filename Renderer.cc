@@ -35,7 +35,7 @@ void Renderer::Init() {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     // Create full screen rendering VBO
-    Quad quad = Quad(-rtt_size_.w/2, -rtt_size_.h/2, rtt_size_.w, rtt_size_.h);
+    Quad quad = Quad(-1, -1, 2, 2);
     memcpy(&quad_.vertices[0], &quad.vertices[0], 4 * sizeof(Vertex));
 	std::cout << quad_.ToString();
     glGenVertexArrays(1, &vao_);
