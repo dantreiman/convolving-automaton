@@ -2,6 +2,7 @@
 #define CONVOLVING_AUTOMATON_RENDERER_H_
 
 #include <random>
+#include "FrameBuffer.h"
 #include "gl_includes.h"
 #include "Shader.h"
 #include "utils.h"
@@ -19,16 +20,19 @@ class Renderer {
 
   void RandomRects(GLFWwindow* window, float length, int iter);
 
-  void DrawScene(GLFWwindow* window, double t);
+  void DrawState(GLFWwindow* window, const FrameBuffer* state);
 
   void Resize(int width, int height);
 
  private:
 	float aspect_ratio_; // The aspect ratio of the render output device
 	Size rtt_size_;
+	Quad q_;
 	std::default_random_engine generator_;
 	std::unique_ptr<Shader> draw_shader_;
 	GLuint vao_;
+	// uniform locations
+	GLint uniform_stateTexture_;
 };
 
 }  // namespace ca

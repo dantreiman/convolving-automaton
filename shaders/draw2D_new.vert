@@ -1,9 +1,8 @@
-#version 140
+#version 330
 
 in vec2 position;
-out vec2 varTexcoord;
 
 void main()
 {
-    varTexcoord = position;
+    gl_Position = vec4(position.x, position.y, 0, 0);
 }

@@ -47,7 +47,11 @@ namespace ca {
 Shader::Shader(const std::string& name) : name_(name) {
 }
 
-bool Shader::Init() {
+bool Shader::Init(const ShaderAttributes& attribute_bindings) {
+    program_ = glCreateProgram();
+    // We have to bind shader attributes after program object created,
+    // and before linking
+    attribute_bindings.Bind(program_);
     if (!Load()) {
         return false;
     }
@@ -58,7 +62,11 @@ bool Shader::Init() {
 }
 
 const GLuint Shader::program() {
-	return program_;
+    return program_;
+}
+
+const GLint Shader::UniformLocation(const GLchar* name) {
+    return glGetUniformLocation(program(), name);
 }
 
 bool Shader::Load() {
@@ -88,7 +96,7 @@ bool Shader::Compile() {
         result &= false;
     }
     else {
-        fprintf(LOGFILE, "vertex shader ok\n\n");
+        //fprintf(LOGFILE, "vertex shader ok\n\n");
     }
 
     glCompileShader(fragment_shader_);
@@ -97,22 +105,21 @@ bool Shader::Compile() {
         result &= false;
     }
     else {
-        fprintf(LOGFILE, "fragment shader ok\n\n");
+        //fprintf(LOGFILE, "fragment shader ok\n\n");
     }
 
-    program_ = glCreateProgram();
     glAttachShader(program_, vertex_shader_);
     glAttachShader(program_, fragment_shader_);
 
     glLinkProgram(program_);
     if (printProgramInfoLog(program_)) {
         fprintf(LOGFILE, "shader linking failed!\n\n");
-		fprintf(LOGFILE, "Vertex Shader:\n%s", vert_src_.c_str());
-		fprintf(LOGFILE, "Fragment Shader:\n%s", frag_src_.c_str());
+        fprintf(LOGFILE, "Vertex Shader:\n%s", vert_src_.c_str());
+        fprintf(LOGFILE, "Fragment Shader:\n%s", frag_src_.c_str());
         result &= false;
     }
     else {
-        fprintf(LOGFILE, "shader program ok\n\n");		
+        //fprintf(LOGFILE, "shader program ok\n\n");        
     }
     return result;
 }

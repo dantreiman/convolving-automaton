@@ -3,6 +3,7 @@
 
 #include <string>
 #include "gl_includes.h"
+#include "ShaderAttributes.h"
 
 namespace ca {
 
@@ -14,12 +15,13 @@ class Shader {
     Shader(const std::string& name);
 
     /**
-     * Link and compile the shader program.
+     * Compile and link the shader program.
      * On error, logs error to the console and returns false.
      */
-    bool Init();
+	bool Init(const ShaderAttributes& attribute_bindings);
 
 	const GLuint program();
+	const GLint UniformLocation(const GLchar* name);
 
   private:
 	bool Load();

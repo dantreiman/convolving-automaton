@@ -246,7 +246,7 @@ void FFT::GeneratePlanY() {
 
 void FFT::LoadShader() {
     Shader * shader = new Shader("fft2D_par");
-	shader->Init();
+	shader->Init(ShaderAttributes());
     shader_.reset(shader);
 }
 

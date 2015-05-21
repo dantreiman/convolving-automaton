@@ -8,15 +8,15 @@
 namespace ca {
 
 class Simulation {
- public:
-  Simulation(const Size& world_size);
-  void Init();
+  public:
+    Simulation(const Size& world_size);
+    void Init();
   
-  // temp
-  GLuint kernel_tex() { return kernel_tex_; }
- private:
-  Size world_size_;
-  GLuint kernel_tex_; // 2 kernels interleaved into 1 texture
+    // temp
+    FrameBuffer* GetStateBuffer() const;
+  private:
+    Size world_size_;
+    FrameBuffer* kernels_;  // inner and outer kernel in (r,g) and (b,a) channels respectively
 };
 
 }  // namespace ca

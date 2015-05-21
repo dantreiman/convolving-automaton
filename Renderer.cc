@@ -6,10 +6,9 @@
 namespace ca {
 namespace {
 
+// Attribute indexes
 enum {
     POS_ATTRIB_IDX,
-    NORMAL_ATTRIB_IDX,
-    TEXCOORD_ATTRIB_IDX
 };
 
 
@@ -50,26 +49,28 @@ void Renderer::Init() {
     fprintf(LOGFILE, "OpenGL Shader Language: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
     // Load default shader
     Shader * draw_shader = new Shader("draw2D_new");
-    draw_shader->Init();
+    draw_shader->Init(ShaderAttributes(POS_ATTRIB_IDX, "position"));
     draw_shader_.reset(draw_shader);
+    uniform_stateTexture_ = draw_shader_->UniformLocation("stateTexture");
     // Set up default settings
     glDisable(GL_DEPTH_TEST);
-    glEnable (GL_CULL_FACE);
+    // glEnable (GL_CULL_FACE);
     // Create full screen rendering VBO
     Quad quad = Quad(rtt_size_);
+	q_ = quad;
     glGenVertexArrays(1, &vao_);
     glBindVertexArray(vao_);
     GLuint posBufferName;
     glGenBuffers(1, &posBufferName);
     glBindBuffer(GL_ARRAY_BUFFER, posBufferName);
-    glBufferData(GL_ARRAY_BUFFER, 4, quad.vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), &(q_.vertices[0]), GL_STATIC_DRAW);
     glEnableVertexAttribArray(POS_ATTRIB_IDX);
     // Set up parmeters for position attribute in the VAO including, 
     // size, type, stride, and offset in the currenly bound VAO
     // This also attaches the position VBO to the VAO
     glVertexAttribPointer(POS_ATTRIB_IDX,  // What attibute index will this array feed in the vertex shader (see buildProgram)
                           2,               // How many elements are there per position?
-                          GL_UNSIGNED_INT, // What is the type of this data?
+                          GL_INT,          // What is the type of this data?
                           GL_FALSE,        // Do we want to normalize this data (0-1 range for fixed-point types)
                           0,               // What is the stride (i.e. bytes between positions)?
                           0);              // What is the offset in the VBO to the position data?
@@ -94,7 +95,7 @@ void Renderer::RandomRects(GLFWwindow* window, float length, int iter) {
     // glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void Renderer::DrawScene(GLFWwindow* window, double t) {
+void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
     glClearColor(0.1f, 0.1f, 0.1f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // glMatrixMode(GL_PROJECTION);
@@ -115,7 +116,10 @@ void Renderer::DrawScene(GLFWwindow* window, double t) {
     CHECK_GL_ERROR("glUseProgram");
     glBindVertexArray(vao_);
     CHECK_GL_ERROR("glBindVertexArray");
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 2);
+    glActiveTexture (GL_TEXTURE0);
+    glBindTexture (GL_TEXTURE_2D, state->texture());
+    CHECK_GL_ERROR("glBindTexture");
+    glDrawArrays(GL_TRIANGLES, 0, 4);
     CHECK_GL_ERROR("glDrawArrays");
     
     //RandomRects(window, 20, 100);

@@ -7,11 +7,13 @@ namespace ca {
 
 class FrameBuffer {
  public:
-	FrameBuffer(GLuint texture, GLuint framebuffer);
-	
+    FrameBuffer(GLuint texture, GLuint framebuffer);
+    GLuint texture() const;
+    GLuint framebuffer() const;
+    
  private:
-	GLuint texture_;
-	GLuint framebuffer_;
+    GLuint texture_;
+    GLuint framebuffer_;
 };
 
 }  // namespace ca
