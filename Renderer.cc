@@ -35,7 +35,7 @@ void Renderer::Init() {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     // Create full screen rendering VBO
-    Quad quad = Quad(rtt_size_);
+    Quad quad = Quad(-rtt_size_.w/2, -rtt_size_.h/2, rtt_size_.w, rtt_size_.h);
     memcpy(&quad_.vertices[0], &quad.vertices[0], 4 * sizeof(Vertex));
 	std::cout << quad_.ToString();
     glGenVertexArrays(1, &vao_);
@@ -105,7 +105,8 @@ void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
 }
 
 void Renderer::Resize(int width, int height) {
-    glViewport(0, 0, width, height);    
+    glViewport(0, 0, width, height);
+    std::cout << "glViewport(0, 0," << width << ", " << height << ")" << std::endl;
     aspect_ratio_ = height ? width / (float)height : 1.f;
 }
 

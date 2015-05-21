@@ -53,6 +53,7 @@ void Engine::Init() {
         // TODO: figure out how to bind callback properly
         // renderer_.Resize(width, height);
         glViewport(0, 0, width, height);
+        std::cout << "glViewport(0, 0," << width << ", " << height << ")" << std::endl;
     });
     glfwSetKeyCallback(window_, [] (GLFWwindow* window, int key, int scancode, int action, int mods) {
         if (action == GLFW_PRESS)
