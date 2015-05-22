@@ -44,9 +44,12 @@ class FFT {
     Size size_;
     int log2x_;
     int log2y_;
-    GLuint planx[MP2][2], plany[MP2][2];
-    GLuint fft1, fft0; // Intermediate buffers
+    GLuint planx_[MP2][2], plany_[MP2][2];
     std::unique_ptr<Shader> shader_;
+	struct uniforms_ {
+		GLuint dim_location;
+		GLuint tangsc_location;
+	};
 };
 
 }

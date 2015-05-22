@@ -86,10 +86,10 @@ void FFT::GeneratePlanTextures() {
               BX = log2x_,
               BY = log2y_;
                 
-    glGenTextures ((BX-1+2)*2, &planx[0][0]);
+    glGenTextures ((BX-1+2)*2, &planx_[0][0]);
     for (int s = 0; s <= 1; s++) {
         for (int eb = 0; eb <= BX-1+1; eb++) {
-            glBindTexture (GL_TEXTURE_1D, planx[eb][s]);
+            glBindTexture (GL_TEXTURE_1D, planx_[eb][s]);
             CHECK_GL_ERROR("glBindTexture");
             glTexParameterf (GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameterf (GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -98,10 +98,10 @@ void FFT::GeneratePlanTextures() {
             CHECK_GL_ERROR("glTexImage1D");
         }
     }
-    glGenTextures ((BY+1)*2, &plany[0][0]);
+    glGenTextures ((BY+1)*2, &plany_[0][0]);
     for (int s = 0; s <= 1; s++) {
         for (int eb=1; eb <= BY; eb++) {
-            glBindTexture (GL_TEXTURE_1D, plany[eb][s]);
+            glBindTexture (GL_TEXTURE_1D, plany_[eb][s]);
             CHECK_GL_ERROR("glBindTexture");
             glTexParameterf (GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameterf (GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -187,7 +187,7 @@ void FFT::GeneratePlanX() {
                     *(p + 4*x + 3) = 0;
                 }
             }
-            glBindTexture (GL_TEXTURE_1D, planx[eb][s]);
+            glBindTexture (GL_TEXTURE_1D, planx_[eb][s]);
             glTexSubImage1D (GL_TEXTURE_1D, 0, 0, NX/2+1, GL_RGBA, GL_FLOAT, p);
         }
     }
@@ -237,7 +237,7 @@ void FFT::GeneratePlanY() {
                 *(p + 4*x + 3) = (float)sin(w);
             }
 
-            glBindTexture (GL_TEXTURE_1D, plany[eb][s]);
+            glBindTexture (GL_TEXTURE_1D, plany_[eb][s]);
             glTexSubImage1D (GL_TEXTURE_1D, 0, 0, NY, GL_RGBA, GL_FLOAT, p);
         }
     }
@@ -246,10 +246,9 @@ void FFT::GeneratePlanY() {
 
 void FFT::LoadShader() {
     Shader * shader = new Shader("fft2D_par");
-	shader->Init(ShaderAttributes());
+    shader->Init(ShaderAttributes());
     shader_.reset(shader);
 }
-
 
 void FFT::Stage(int dim, int eb, int si, FrameBuffer* src, FrameBuffer* dst) {
 	

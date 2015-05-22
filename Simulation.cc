@@ -38,9 +38,9 @@ void Simulation::Init() {
     CHECK_GL_ERROR("glTexSubImage2D");
     kernels_ = kernel_buffer;
     // Just to test, create an FFT
-    // FFT * fft = new FFT(world_size_);
-    // fft->Init();
-    // std::cout << "Initialized FFT" << std::endl;
+    FFT * fft = new FFT(world_size_);
+    fft->Init();
+    std::cout << "Initialized FFT" << std::endl;
 }
 
 FrameBuffer* Simulation::GetStateBuffer() const {
