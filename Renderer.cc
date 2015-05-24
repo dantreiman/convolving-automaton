@@ -18,20 +18,19 @@ void Renderer::Init() {
     Shader * draw_shader = new Shader("draw2D_new");
     draw_shader->Init(ShaderAttributes());
     draw_shader_.reset(draw_shader);
-    // uniform_stateTexture_ = draw_shader_->UniformLocation("stateTexture");
+    uniform_stateTexture_ = draw_shader_->UniformLocation("stateTexture");
     // Set up default settings
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     // Create full screen rendering VBO
     Quad quad = Quad(-1, -1, 2, 2);
-    memcpy(&quad_.vertices[0], &quad.vertices[0], 4 * sizeof(Vertex));
-	// std::cout << quad_.ToString();
+	// std::cout << quad.ToString();
     glGenVertexArrays(1, &vao_);
     glBindVertexArray(vao_);
     GLuint posBufferName;
     glGenBuffers(1, &posBufferName);
     glBindBuffer(GL_ARRAY_BUFFER, posBufferName);
-    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), &quad_.vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), &quad.vertices[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(POS_ATTRIB_LOCATION);
     // Set up parmeters for position attribute in the VAO including, 
     // size, type, stride, and offset in the currenly bound VAO

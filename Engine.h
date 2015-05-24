@@ -2,9 +2,9 @@
 #define CONVOLVING_AUTOMATON_ENGINE_H_
 
 #include "gl_includes.h"
-#include "utils.h"
 #include "Renderer.h"
 #include "Simulation.h"
+#include "utils.h"
 
 namespace ca {
 

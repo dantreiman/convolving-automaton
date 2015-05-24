@@ -46,10 +46,14 @@ class FFT {
     int log2y_;
     GLuint planx_[MP2][2], plany_[MP2][2];
     std::unique_ptr<Shader> shader_;
-	struct uniforms_ {
-		GLuint dim_location;
-		GLuint tangsc_location;
-	};
+    GLuint vao_;
+    struct {
+        GLint dim_location;
+        GLint tang_location;
+        GLint tangsc_location;
+        GLint state_tex_location;
+        GLint plan_tex_location;
+    } uniforms_;
 };
 
 }

@@ -49,15 +49,18 @@ Shader::Shader(const std::string& name) : name_(name) {
 
 bool Shader::Init(const ShaderAttributes& attribute_bindings) {
     program_ = glCreateProgram();
+	CHECK_GL_ERROR("glCreateProgram");
     // We have to bind shader attributes after program object created,
     // and before linking
     attribute_bindings.Bind(program_);
     if (!Load()) {
         return false;
     }
+
     if (!Compile()) {
         return false;
     }
+
     return true;
 }
 
@@ -74,16 +77,20 @@ bool Shader::Load() {
     std::ifstream vert_file(vert_path);
     vert_src_ = std::string((std::istreambuf_iterator<char>(vert_file)), std::istreambuf_iterator<char>());
     vertex_shader_ = glCreateShader (GL_VERTEX_SHADER);
+    CHECK_GL_ERROR("glCreateShader");
     const char * vert_src_cstring = vert_src_.c_str();
     glShaderSource(vertex_shader_, 1, &vert_src_cstring, NULL);
+    CHECK_GL_ERROR("glShaderSource");
     
     std::string frag_path = "shaders/" + name_ + ".frag";
     std::ifstream frag_file(frag_path);
     frag_src_ = std::string((std::istreambuf_iterator<char>(frag_file)), std::istreambuf_iterator<char>());
     fragment_shader_ = glCreateShader (GL_FRAGMENT_SHADER);
+    CHECK_GL_ERROR("glCreateShader");
     const char * frag_src_cstring = frag_src_.c_str();
     glShaderSource(fragment_shader_, 1, &frag_src_cstring, NULL);
-    
+    CHECK_GL_ERROR("glShaderSource");
+   
     // TODO: error checking
     return true;
 }

@@ -41,6 +41,8 @@ void Simulation::Init() {
     FFT * fft = new FFT(world_size_);
     fft->Init();
     std::cout << "Initialized FFT" << std::endl;
+    // Run an FFT
+    kernels_fft_ = fft->Forward(kernels_);
 }
 
 FrameBuffer* Simulation::GetStateBuffer() const {

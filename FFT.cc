@@ -4,6 +4,7 @@
 #include <cmath>
 #include "FrameBufferCache.h"
 #include "log.h"
+#include "Quad.h"
 
 namespace {
 
@@ -35,6 +36,7 @@ FFT::FFT(const Size& size) : size_(size) {
 }
 
 void FFT::Init() {
+    GeneratePlanTextures();
     GeneratePlanX();
     GeneratePlanY();
     LoadShader();
@@ -87,6 +89,7 @@ void FFT::GeneratePlanTextures() {
               BY = log2y_;
                 
     glGenTextures ((BX-1+2)*2, &planx_[0][0]);
+    CHECK_GL_ERROR("glGenTextures");
     for (int s = 0; s <= 1; s++) {
         for (int eb = 0; eb <= BX-1+1; eb++) {
             glBindTexture (GL_TEXTURE_1D, planx_[eb][s]);
@@ -99,6 +102,7 @@ void FFT::GeneratePlanTextures() {
         }
     }
     glGenTextures ((BY+1)*2, &plany_[0][0]);
+    CHECK_GL_ERROR("glGenTextures");
     for (int s = 0; s <= 1; s++) {
         for (int eb=1; eb <= BY; eb++) {
             glBindTexture (GL_TEXTURE_1D, plany_[eb][s]);
@@ -248,10 +252,100 @@ void FFT::LoadShader() {
     Shader * shader = new Shader("fft2D_par");
     shader->Init(ShaderAttributes());
     shader_.reset(shader);
+    uniforms_.dim_location = shader->UniformLocation("dim");
+    uniforms_.tang_location = shader->UniformLocation("tang");
+    uniforms_.tangsc_location = shader->UniformLocation("tangsc");
+    uniforms_.state_tex_location = shader->UniformLocation("stateTex");
+    uniforms_.plan_tex_location = shader->UniformLocation("planTex");
+    // Create a VAO
+    Quad quad = Quad(-1, -1, 2, 2);
+    glGenVertexArrays(1, &vao_);
+    CHECK_GL_ERROR("glGenVertexArrays");
+    glBindVertexArray(vao_);
+    CHECK_GL_ERROR("glBindVertexArray");
+    GLuint posBufferName;
+    glGenBuffers(1, &posBufferName);
+    CHECK_GL_ERROR("glGenBuffers");
+    glBindBuffer(GL_ARRAY_BUFFER, posBufferName);
+    CHECK_GL_ERROR("glBindBuffer");
+    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), &quad.vertices[0], GL_STATIC_DRAW);
+    CHECK_GL_ERROR("glBufferData");
+    glEnableVertexAttribArray(POS_ATTRIB_LOCATION);
+    CHECK_GL_ERROR("glEnableVertexAttribArray");
+    glVertexAttribIPointer(POS_ATTRIB_LOCATION,
+                           2,
+                           GL_INT,
+                           0,
+                           BUFFER_OFFSET(0));
+    CHECK_GL_ERROR("glVertexAttribIPointer");
 }
 
 void FFT::Stage(int dim, int eb, int si, FrameBuffer* src, FrameBuffer* dst) {
-	
+    // Renaming variables to preserve copy-pasted code
+    const int NX = size_.w;
+    const int NY = size_.h;
+    const int BX = log2x_;
+    const int BY = log2y_;
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, dst->framebuffer());
+    CHECK_GL_ERROR("glBindFramebuffer");
+    glViewport(0, 0, size_.w, size_.h);
+    glUseProgram(shader_->program());
+    CHECK_GL_ERROR("glUseProgram");
+    glUniform1i(uniforms_.dim_location, dim);
+    CHECK_GL_ERROR("glUniform1i");
+
+    int tang;
+    double tangsc;
+    if (dim==1 && si==1 && eb==0) {
+        tang = 1;
+        tangsc = 0.5*sqrt(2.0);
+    }
+    else if (dim==1 && si==-1 && eb==BX) {
+        tang = 1;
+        tangsc = 0.5/sqrt(2.0);
+    }
+    else {
+        tang = 0;
+        tangsc = 0.0;
+    }
+    glUniform1i(uniforms_.tang_location, tang);
+    glUniform1f(uniforms_.tangsc_location, (float)tangsc);
+
+    double gd;
+    int gi;
+    if (dim==2 || dim==3 || (dim==1 && si==-1 && eb==BX))
+    {
+        gd = 1.0;
+        gi = NX/2+1;
+    }
+    else
+    {
+        gd = 1.0-1.0/(NX/2+1);
+        gi = NX/2;
+    }
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, src->texture());
+    glUniform1i(uniforms_.state_tex_location, 0);
+
+    glActiveTexture (GL_TEXTURE1);
+    if (dim==1) {
+        glBindTexture (GL_TEXTURE_1D, planx_[eb][(si+1)/2]);
+    }
+    else { // dim == 2
+        glBindTexture (GL_TEXTURE_1D, plany_[eb][(si+1)/2]);
+    }
+    glUniform1i(uniforms_.plan_tex_location, 1);
+
+    glBindVertexArray(vao_);
+    CHECK_GL_ERROR("glBindVertexArray");
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    CHECK_GL_ERROR("glDrawArrays");
+    
+    // glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tb[ffto], 0);
+
+    glUseProgram(0);
 }
 
 }  // namespace ca

@@ -29,7 +29,6 @@ class Renderer {
     float aspect_ratio_; // The aspect ratio of the render output device
     Size rtt_size_;
     GLuint default_framebuffer_;
-    Quad quad_;
     std::default_random_engine generator_;
     std::unique_ptr<Shader> draw_shader_;
     GLuint vao_;
