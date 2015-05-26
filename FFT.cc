@@ -58,8 +58,8 @@ FrameBuffer* FFT::Forward(FrameBuffer* src) {
         Stage(2, t, si, read, write);
         std::swap(read, write);
     }
-    cache->RecycleBuffer(read);
-    return write;
+    cache->RecycleBuffer(write);
+    return read;
 }
 
 FrameBuffer* FFT::Inverse(FrameBuffer* src) {
