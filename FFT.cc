@@ -198,7 +198,6 @@ void FFT::GeneratePlanX() {
     free(p);
 } 
 
-
 void FFT::GeneratePlanY() {
     const int NY = size_.h;
     const int BY = log2y_;
@@ -299,11 +298,11 @@ void FFT::Stage(int dim, int eb, int si, FrameBuffer* src, FrameBuffer* dst) {
     double tangsc;
     if (dim==1 && si==1 && eb==0) {
         tang = 1;
-        tangsc = 0.5*sqrt(2.0);
+        tangsc = 0.5 * M_SQRT2;
     }
     else if (dim==1 && si==-1 && eb==BX) {
         tang = 1;
-        tangsc = 0.5/sqrt(2.0);
+        tangsc = 0.5 / M_SQRT2;
     }
     else {
         tang = 0;
@@ -311,19 +310,6 @@ void FFT::Stage(int dim, int eb, int si, FrameBuffer* src, FrameBuffer* dst) {
     }
     glUniform1i(uniforms_.tang_location, tang);
     glUniform1f(uniforms_.tangsc_location, (float)tangsc);
-
-    double gd;
-    int gi;
-    if (dim==2 || dim==3 || (dim==1 && si==-1 && eb==BX))
-    {
-        gd = 1.0;
-        gi = NX/2+1;
-    }
-    else
-    {
-        gd = 1.0-1.0/(NX/2+1);
-        gi = NX/2;
-    }
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, src->texture());

@@ -26,7 +26,6 @@ class Renderer {
   void Resize(int width, int height);
 
  private:
-    float aspect_ratio_; // The aspect ratio of the render output device
     Size rtt_size_;
     GLuint default_framebuffer_;
     std::default_random_engine generator_;

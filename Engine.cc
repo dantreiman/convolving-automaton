@@ -17,7 +17,6 @@ Engine::Engine(const Size& world_size) : window_(NULL),
 }
 
 void Engine::Init() {
-    
     if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize GLFW\n");
         exit(EXIT_FAILURE);
@@ -38,6 +37,7 @@ void Engine::Init() {
         width  = mode->width;
         height = mode->height;
     }
+	
     window_ = glfwCreateWindow(width, height, "ConvolvingAutomaton", monitor_, NULL);
     if (!window_) {
         fprintf(stderr, "Failed to create GLFW window\n");
@@ -49,12 +49,7 @@ void Engine::Init() {
     }
     glfwMakeContextCurrent(window_);
     glfwSwapInterval(1);
-    glfwSetWindowSizeCallback(window_, [] (GLFWwindow* window, int width, int height) {
-        // TODO: figure out how to bind callback properly
-        // renderer_.Resize(width, height);
-        glViewport(0, 0, width, height);
-        std::cout << "glViewport(0, 0," << width << ", " << height << ")" << std::endl;
-    });
+
     glfwSetKeyCallback(window_, [] (GLFWwindow* window, int key, int scancode, int action, int mods) {
         if (action == GLFW_PRESS)
         {
@@ -71,11 +66,7 @@ void Engine::Init() {
     });
     
     renderer_.Init();
-    // Set initial aspect ratio
-    glfwGetWindowSize(window_, &width, &height);
-    renderer_.Resize(width, height);
-
-    // Set up simulation
+    // Set up simulation after renderer, simulation requires GL setup
     simulation_.Init();
 }
 
@@ -85,6 +76,7 @@ void Engine::RunLoop() {
     while (!glfwWindowShouldClose(window_)) {
         //float t = glfwGetTime();
         FrameBuffer* state = simulation_.GetStateBuffer();
+		int width, height;
         renderer_.DrawState(window_, state);
         glfwSwapBuffers(window_);
         glfwPollEvents();

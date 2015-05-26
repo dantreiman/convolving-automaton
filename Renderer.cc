@@ -6,7 +6,6 @@
 namespace ca {
 
 Renderer::Renderer(const Size& rtt_size, GLuint default_framebuffer) :
-	aspect_ratio_(1),
     rtt_size_(rtt_size),
 	default_framebuffer_(default_framebuffer) {}
 
@@ -68,7 +67,13 @@ void Renderer::RandomRects(GLFWwindow* window, float length, int iter) {
 }
 
 void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
+	Size frame_size;
 	glBindFramebuffer(GL_FRAMEBUFFER, default_framebuffer_);
+    // Resize renderer, since simulation RTT changes viewport
+	glfwGetFramebufferSize(window, &frame_size.w, &frame_size.h);
+	// std::cout << "glViewport(0, 0," << frame_size.w << ", " << frame_size.h << ")" << std::endl;
+	glViewport(0, 0, frame_size.w, frame_size.h);
+    
     glClearColor(0.4f, 0.4f, 1.0f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT);
     CHECK_GL_ERROR("glClear");
@@ -81,12 +86,6 @@ void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
     CHECK_GL_ERROR("glBindVertexArray");
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     CHECK_GL_ERROR("glDrawArrays");
-}
-
-void Renderer::Resize(int width, int height) {
-    glViewport(0, 0, width, height);
-    std::cout << "glViewport(0, 0," << width << ", " << height << ")" << std::endl;
-    aspect_ratio_ = height ? width / (float)height : 1.f;
 }
 
 } // namespace ca

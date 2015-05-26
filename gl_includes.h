@@ -13,6 +13,7 @@ namespace ca {
 // Common vertex shader attribute locations
 // Defined in shaders
 enum {
+    // layout(location = 0) in ivec2 position;
     POS_ATTRIB_LOCATION = 0,
 };
 
