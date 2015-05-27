@@ -31,4 +31,6 @@ void main()
     Res.xy = inverse ? Res.xy / 2.0 : Res.xy;
     Res.zw = inverse ? Res.zw / 2.0 : Res.zw;
     fragColor = Res;
+    fragColor.r = 1.0;
+    fragColor.a = 1.0;
 }

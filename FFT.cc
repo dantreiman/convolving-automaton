@@ -197,8 +197,7 @@ void FFT::Stage(int dimension, int stage, FrameBuffer* src, FrameBuffer* dst) {
     const int BX = log2x_;
     const int BY = log2y_;
     
-    glBindFramebuffer(GL_FRAMEBUFFER, dst->framebuffer());
-    CHECK_GL_ERROR("glBindFramebuffer");
+	dst->Bind();
     glViewport(0, 0, size_.w, size_.h);
     glUseProgram(shader_->program());
     CHECK_GL_ERROR("glUseProgram");
@@ -219,8 +218,6 @@ void FFT::Stage(int dimension, int stage, FrameBuffer* src, FrameBuffer* dst) {
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     CHECK_GL_ERROR("glDrawArrays");
     
-    // glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tb[ffto], 0);
-
     glUseProgram(0);
 }
 
