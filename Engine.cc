@@ -76,7 +76,6 @@ void Engine::RunLoop() {
     while (!glfwWindowShouldClose(window_)) {
         //float t = glfwGetTime();
         FrameBuffer* state = simulation_.GetStateBuffer();
-		int width, height;
         renderer_.DrawState(window_, state);
         glfwSwapBuffers(window_);
         glfwPollEvents();

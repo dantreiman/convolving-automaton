@@ -49,7 +49,7 @@ Shader::Shader(const std::string& name) : name_(name) {
 
 bool Shader::Init(const ShaderAttributes& attribute_bindings) {
     program_ = glCreateProgram();
-	CHECK_GL_ERROR("glCreateProgram");
+    CHECK_GL_ERROR("glCreateProgram");
     // We have to bind shader attributes after program object created,
     // and before linking
     attribute_bindings.Bind(program_);

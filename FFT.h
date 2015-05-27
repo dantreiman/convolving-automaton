@@ -19,7 +19,7 @@ namespace ca {
 class FFT {
   public:
     /**
-     * Size must be a power of 2.
+     * Size must be a power of 2 square.
      */
     FFT(const Size& size);
     void Init();
@@ -36,21 +36,19 @@ class FFT {
 
   private:
     void GeneratePlanTextures();
-    void GeneratePlanX();
-    void GeneratePlanY();
+    void GeneratePlan();
     void LoadShader();
-    void Stage(int dim, int eb, int si, FrameBuffer* src, FrameBuffer* dst);
+    void Stage(int dimension, int stage, FrameBuffer* src, FrameBuffer* dst);
     
     Size size_;
     int log2x_;
     int log2y_;
-    GLuint planx_[MP2][2], plany_[MP2][2];
+	GLuint plan_[MP2];
     std::unique_ptr<Shader> shader_;
     GLuint vao_;
     struct {
-        GLint dim_location;
-        GLint tang_location;
-        GLint tangsc_location;
+        GLint dimension_location;
+        GLint inverse_location;
         GLint state_tex_location;
         GLint plan_tex_location;
     } uniforms_;
