@@ -26,7 +26,7 @@ void FrameBuffer::Bind() const {
 
 std::string FrameBuffer::DebugString() const {
     std::stringstream stream;
-    stream << " framebuffer: " << framebuffer() << " texture: " << texture() << std::endl;
+    stream << " framebuffer: " << framebuffer() << " texture: " << texture();
     return stream.str();
 }
 

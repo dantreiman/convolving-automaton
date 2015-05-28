@@ -47,7 +47,7 @@ void Simulation::Init() {
 
 FrameBuffer* Simulation::GetStateBuffer() const {
     // TODO: actually return the current unused state buffer
-    return kernels_;
+    return kernels_fft_;
 }
 
 }  // namespace ca

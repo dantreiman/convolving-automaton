@@ -55,15 +55,18 @@ FrameBuffer* FFT::Forward(FrameBuffer* src) {
     FrameBuffer* temp2 = cache->ReserveBuffer();
     FrameBuffer* read = src;
     FrameBuffer* write = temp1;
-    for (int x_stage = 0; x_stage < log2x_; x_stage++) {
-        Stage(0, x_stage, read, write);
-		if (read == src) { read = temp2; } // Read from src on the 1st stage
-        std::swap(read, write);
-    }
-    for (int y_stage = 0; y_stage < log2y_; y_stage++) {
-        Stage(1, y_stage, read, write);
-        std::swap(read, write);
-    }
+        for (int x_stage = 0; x_stage < log2x_; x_stage++) {
+    std::cout << "X stage: from " << read->DebugString() << " to " << write->DebugString() << std::endl;
+            Stage(0, x_stage, read, write);
+    if (read == src) { read = temp2; } // Read from src on the 1st stage
+            std::swap(read, write);
+        }
+        for (int y_stage = 0; y_stage < log2y_; y_stage++) {
+    std::cout << "Y stage: from " << read->DebugString() << " to " << write->DebugString() << std::endl;
+            Stage(1, y_stage, read, write);
+            std::swap(read, write);
+        }
+	std::cout << "Returning " << read->DebugString() << " Recycling " << write->DebugString() << std::endl;
     cache->RecycleBuffer(write);
     return read;
 }
@@ -197,8 +200,10 @@ void FFT::Stage(int dimension, int stage, FrameBuffer* src, FrameBuffer* dst) {
     const int BX = log2x_;
     const int BY = log2y_;
     
-	dst->Bind();
+    glBindFramebuffer(GL_FRAMEBUFFER, dst->framebuffer());
+    CHECK_GL_ERROR("glBindFrameBuffer");
     glViewport(0, 0, size_.w, size_.h);
+
     glUseProgram(shader_->program());
     CHECK_GL_ERROR("glUseProgram");
     glUniform1i(uniforms_.inverse_location, 0);
@@ -208,10 +213,14 @@ void FFT::Stage(int dimension, int stage, FrameBuffer* src, FrameBuffer* dst) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, src->texture());
     glUniform1i(uniforms_.state_tex_location, 0);
-
+     
     glActiveTexture (GL_TEXTURE1);
     glBindTexture (GL_TEXTURE_1D, plan_[stage]);
     glUniform1i(uniforms_.plan_tex_location, 1);
+
+    glActiveTexture(GL_TEXTURE0);
+
+    //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dst->texture(), 0);
 
     glBindVertexArray(vao_);
     CHECK_GL_ERROR("glBindVertexArray");

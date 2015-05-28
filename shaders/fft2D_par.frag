@@ -1,6 +1,6 @@
 #version 330 core
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 uniform int dimension;
 uniform bool inverse;
@@ -31,6 +31,4 @@ void main()
     Res.xy = inverse ? Res.xy / 2.0 : Res.xy;
     Res.zw = inverse ? Res.zw / 2.0 : Res.zw;
     fragColor = Res;
-    fragColor.r = 1.0;
-    fragColor.a = 1.0;
 }
