@@ -20,11 +20,15 @@ void Simulation::Init() {
     float outer_sum = RingKernel(&outer_kernel, 7, 20, 1);
     
     Buffer2D<Vec4<float>> kernels(world_size_);
-    
+    Size half_size = Size(world_size_.w / 2, world_size_.h / 2);
     for (int x = 0; x < world_size_.w; x++) {
         for (int y = 0; y < world_size_.h; y++) {
-            kernels.set(x, y, Vec4<float>(inner_kernel.get(x, y), 0,
-                                          outer_kernel.get(x, y), 0));
+            // Perform FFT shift
+            const int shift_x = (x + half_size.w) % world_size_.w;
+            const int shift_y = (y + half_size.h) % world_size_.h;
+            // Interleave both kernels using r and b channels of the same image
+            kernels.set(x, y, Vec4<float>(inner_kernel.get(shift_x, shift_y), 0,
+                                          outer_kernel.get(shift_x, shift_y), 0));
         }
     }
     FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
