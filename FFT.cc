@@ -6,6 +6,8 @@
 #include "log.h"
 #include "Quad.h"
 
+#define LOG_FFT_PERFORMANCE 0
+
 namespace {
 
 int bit_reverse(int i, int N) {
@@ -56,40 +58,44 @@ FrameBuffer* FFT::Forward(FrameBuffer* src) {
     FrameBuffer* read = src;
     FrameBuffer* write = temp1;
     for (int x_stage = 0; x_stage < log2x_; x_stage++) {
+#if (LOG_FFT_PERFORMANCE)
         std::cout << "X stage: from " << read->DebugString() << " to " << write->DebugString() << std::endl;
-        Stage(0, x_stage, read, write);
+#endif
+        Stage(0, x_stage, 0, read, write);
         if (read == src) { read = temp2; } // Read from src on the 1st stage
         std::swap(read, write);
     }
     for (int y_stage = 0; y_stage < log2y_; y_stage++) {
+#if (LOG_FFT_PERFORMANCE)
         std::cout << "Y stage: from " << read->DebugString() << " to " << write->DebugString() << std::endl;
-        Stage(1, y_stage, read, write);
+#endif 
+        Stage(1, y_stage, 0, read, write);
         std::swap(read, write);
     }
+#if (LOG_FFT_PERFORMANCE)
     std::cout << "Returning " << read->DebugString() << " Recycling " << write->DebugString() << std::endl;
+#endif 
     cache->RecycleBuffer(write);
     return read;
 }
 
 FrameBuffer* FFT::Inverse(FrameBuffer* src) {
-    const int si = 1; // -1 forward, 1 inverse
-    // FrameBufferCache * cache = FrameBufferCache::sharedCache(size_);
-    // FrameBuffer* temp1 = cache->ReserveBuffer();
-    // FrameBuffer* temp2 = cache->ReserveBuffer();
-    // FrameBuffer* read = src;
-    // FrameBuffer* write = temp1;
-    // for (int t = 1; t <= log2y_; t++) {
-    //     Stage(2, t, si, read, write);
-    //     if (read == src) { read = temp2; } // Read from src on the 1st stage
-    //     std::swap(read, write);
-    // }
-    // for (int t = 0; t <= log2x_-1; t++) {
-    //     Stage(1, t, si, read, write);
-    //     std::swap(read, write);
-    // }
-    // cache->RecycleBuffer(read);
-    // return write;
-    return NULL;
+	FrameBufferCache * cache = FrameBufferCache::sharedCache(size_);
+    FrameBuffer* temp1 = cache->ReserveBuffer();
+    FrameBuffer* temp2 = cache->ReserveBuffer();
+    FrameBuffer* read = src;
+    FrameBuffer* write = temp1;
+    for (int x_stage = 0; x_stage < log2x_; x_stage++) {
+        Stage(0, x_stage, 1, read, write);
+        if (read == src) { read = temp2; } // Read from src on the 1st stage
+        std::swap(read, write);
+    }
+    for (int y_stage = 0; y_stage < log2y_; y_stage++) {
+        Stage(1, y_stage, 1, read, write);
+        std::swap(read, write);
+    }
+    cache->RecycleBuffer(write);
+    return read;
 }
 
 void FFT::GeneratePlanTextures() {
@@ -201,7 +207,7 @@ void FFT::LoadShader() {
     CHECK_GL_ERROR("glVertexAttribIPointer");
 }
 
-void FFT::Stage(int dimension, int stage, FrameBuffer* src, FrameBuffer* dst) {
+void FFT::Stage(int dimension, int stage, int inverse, FrameBuffer* src, FrameBuffer* dst) {
     // Renaming variables to preserve copy-pasted code
     const int NX = size_.w;
     const int NY = size_.h;
@@ -214,7 +220,7 @@ void FFT::Stage(int dimension, int stage, FrameBuffer* src, FrameBuffer* dst) {
 
     glUseProgram(shader_->program());
     CHECK_GL_ERROR("glUseProgram");
-    glUniform1i(uniforms_.inverse_location, 0);
+    glUniform1i(uniforms_.inverse_location, inverse);
     glUniform1i(uniforms_.dimension_location, dimension);
     CHECK_GL_ERROR("glUniform1i");
 

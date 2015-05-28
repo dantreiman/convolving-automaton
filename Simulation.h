@@ -18,6 +18,7 @@ class Simulation {
     Size world_size_;
     FrameBuffer* kernels_;  // inner and outer kernel in (r,g) and (b,a) channels respectively
     FrameBuffer* kernels_fft_;
+    FrameBuffer* kernels_fft_inv_;
 };
 
 }  // namespace ca

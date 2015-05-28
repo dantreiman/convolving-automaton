@@ -47,11 +47,12 @@ void Simulation::Init() {
     std::cout << "Initialized FFT" << std::endl;
     // Run an FFT
     kernels_fft_ = fft->Forward(kernels_);
+	kernels_fft_inv_ = fft->Inverse(kernels_fft_);
 }
 
 FrameBuffer* Simulation::GetStateBuffer() const {
     // TODO: actually return the current unused state buffer
-    return kernels_fft_;
+    return kernels_fft_inv_;
 }
 
 }  // namespace ca
