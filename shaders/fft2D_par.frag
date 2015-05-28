@@ -10,7 +10,7 @@ uniform sampler1D planTex;
 
 void main()
 {
-    vec2 texcoord = gl_FragCoord.xy - vec2(0.5, 0.5);
+    vec2 texcoord = (gl_FragCoord.xy - vec2(0.5, 0.5)) / 512.0;
     float s = dimension == 0 ? texcoord.x : texcoord.y;
     vec4 b = texture(planTex, s);
     vec2 newcoord;

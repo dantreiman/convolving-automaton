@@ -28,10 +28,10 @@ int log2int(unsigned int v) {
 }
 
 struct Butterfly {
-    int x;
-    int y;
-    int wr;  // real weight
-    int wi;  // imaginary weight
+    float x;
+    float y;
+    float wr;  // real weight
+    float wi;  // imaginary weight
 };
 
 }  // namespace
@@ -55,18 +55,18 @@ FrameBuffer* FFT::Forward(FrameBuffer* src) {
     FrameBuffer* temp2 = cache->ReserveBuffer();
     FrameBuffer* read = src;
     FrameBuffer* write = temp1;
-        for (int x_stage = 0; x_stage < log2x_; x_stage++) {
-    std::cout << "X stage: from " << read->DebugString() << " to " << write->DebugString() << std::endl;
-            Stage(0, x_stage, read, write);
-    if (read == src) { read = temp2; } // Read from src on the 1st stage
-            std::swap(read, write);
-        }
-        for (int y_stage = 0; y_stage < log2y_; y_stage++) {
-    std::cout << "Y stage: from " << read->DebugString() << " to " << write->DebugString() << std::endl;
-            Stage(1, y_stage, read, write);
-            std::swap(read, write);
-        }
-	std::cout << "Returning " << read->DebugString() << " Recycling " << write->DebugString() << std::endl;
+    for (int x_stage = 0; x_stage < log2x_; x_stage++) {
+        std::cout << "X stage: from " << read->DebugString() << " to " << write->DebugString() << std::endl;
+        Stage(0, x_stage, read, write);
+        if (read == src) { read = temp2; } // Read from src on the 1st stage
+        std::swap(read, write);
+    }
+    for (int y_stage = 0; y_stage < log2y_; y_stage++) {
+        std::cout << "Y stage: from " << read->DebugString() << " to " << write->DebugString() << std::endl;
+        Stage(1, y_stage, read, write);
+        std::swap(read, write);
+    }
+    std::cout << "Returning " << read->DebugString() << " Recycling " << write->DebugString() << std::endl;
     cache->RecycleBuffer(write);
     return read;
 }
@@ -118,42 +118,50 @@ void FFT::GeneratePlan() {
     {
         int blocks = 1<<(b - 1 - i);
         int block_inputs = 1<<i;
-        for(int j = 0; j < blocks; ++j)
-            for(int k = 0; k < block_inputs; ++k)
-        {
-            int i1 = j*block_inputs*2 + k;
-            int i2 = i1 + block_inputs;
-            float j1, j2;
-            if(i == 0)
-            {
-                j1 = static_cast<float>(bit_reverse(i1, s));
-                j2 = static_cast<float>(bit_reverse(i2, s));
-            }
-            else
-            {
-                j1 = static_cast<float>(i1);
-                j2 = static_cast<float>(i2);
-            }
-            i1 += n;
-            i2 += n;
-            butterfly[i1].x = j1;
-            butterfly[i1].y = j2;
-            butterfly[i2].x = j1;
-            butterfly[i2].y = j2;
+        for(int j = 0; j < blocks; ++j) {
+            for(int k = 0; k < block_inputs; ++k) {
+                int i1 = j*block_inputs*2 + k;
+                int i2 = i1 + block_inputs;
+                float j1, j2;
+                if(i == 0)
+                {
+                    j1 = static_cast<float>(bit_reverse(i1, s));
+                    j2 = static_cast<float>(bit_reverse(i2, s));
+                }
+                else
+                {
+                    j1 = static_cast<float>(i1);
+                    j2 = static_cast<float>(i2);
+                }
+                i1 += n;
+                i2 += n;
+                // normalize scramblers for use as texture coordinates
+                butterfly[i1].x = j1 / float(s);
+                butterfly[i1].y = j2 / float(s);
+                butterfly[i2].x = j1 / float(s);
+                butterfly[i2].y = j2 / float(s);
 
-        // Compute weights
-            double angle = 2.0*M_PI*k*blocks/static_cast<float>(s);
-            float wr = static_cast<float>( cos(angle));
-            float wi = static_cast<float>(-sin(angle));
+            // Compute weights
+                double angle = 2.0*M_PI*k*blocks/static_cast<float>(s);
+                float wr = static_cast<float>( cos(angle));
+                float wi = static_cast<float>(-sin(angle));
 
-            butterfly[i1].wr = wr;
-            butterfly[i1].wi = wi;
-            butterfly[i2].wr = -wr;
-            butterfly[i2].wi = -wi;
+                butterfly[i1].wr = wr;
+                butterfly[i1].wi = wi;
+                butterfly[i2].wr = -wr;
+                butterfly[i2].wi = -wi;
+            }
         }
         n += s;
     }
     for (int stage = 0; stage < b; stage++) {
+        // Write plan to stdout
+        // if (stage == 1) {
+        //  for (int i = 0; i < s; i++) {
+        //      Butterfly& b = butterfly[i];
+        //      std::cout << "( " << b.x << ", " << b.y << ", " << b.wr << ", " << b.wi << " )" << std::endl;
+        //  }
+        // }
         glBindTexture (GL_TEXTURE_1D, plan_[stage]);
         CHECK_GL_ERROR("glBindTexture");
         glTexSubImage1D (GL_TEXTURE_1D, 0, 0, s, GL_RGBA, GL_FLOAT, &butterfly[stage * s]);
@@ -210,16 +218,14 @@ void FFT::Stage(int dimension, int stage, FrameBuffer* src, FrameBuffer* dst) {
     glUniform1i(uniforms_.dimension_location, dimension);
     CHECK_GL_ERROR("glUniform1i");
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, src->texture());
-    glUniform1i(uniforms_.state_tex_location, 0);
-     
     glActiveTexture (GL_TEXTURE1);
     glBindTexture (GL_TEXTURE_1D, plan_[stage]);
     glUniform1i(uniforms_.plan_tex_location, 1);
 
     glActiveTexture(GL_TEXTURE0);
-
+    glBindTexture(GL_TEXTURE_2D, src->texture());
+    glUniform1i(uniforms_.state_tex_location, 0);
+     
     //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dst->texture(), 0);
 
     glBindVertexArray(vao_);
