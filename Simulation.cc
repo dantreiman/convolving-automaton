@@ -54,9 +54,9 @@ void Simulation::InitKernels() {
     CHECK_GL_ERROR("glBindTexture");
     glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, world_size_.w, world_size_.h, GL_RGBA, GL_FLOAT, kernels.data());    
     CHECK_GL_ERROR("glTexSubImage2D");
-    kernels_ = kernel_buffer;
     // Compute the DFT of both kernels
-    kernels_fft_ = fft_.Forward(kernels_);
+    kernels_fft_ = fft_.Forward(kernel_buffer);
+    cache->RecycleBuffer(kernel_buffer);
 }
 
 
@@ -68,25 +68,31 @@ void Simulation::InitState() {
         state_ring_.Add(buffer);
     }
     // Configure initial state
-    FrameBuffer * initialState = state_ring_.read_buffer();
+    FrameBuffer * front_buffer = state_ring_.read_buffer();
+    Buffer2D<Vec4<float>> state(world_size_);
     
-    // glEnableClientState(GL_VERTEX_ARRAY);
-    //     std::uniform_int_distribution<int> x_dist(0, rtt_size_.w);
-    //     std::uniform_int_distribution<int> y_dist(0, rtt_size_.h);
-    //     std::uniform_int_distribution<int> r_dist(length * .5, length * 1.5);
-    //     
-    //     // glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    //     for (int i = 0; i < iter; i++) {
-    //         float x = x_dist(generator_);
-    //         float y = y_dist(generator_);
-    //         float w = r_dist(generator_);
-    //         float h = r_dist(generator_);
-    //  Quad quad(x, y, w, h);
-    //  glVertexPointer(2, GL_INT, 0, quad.vertices);
-    //  glDrawArrays(GL_TRIANGLE_STRIP, 0, 2);
-    //     }
-    // glDisableClientState(GL_VERTEX_ARRAY);
-    
+    const float length = 10;
+    const float iter = 100;
+    std::uniform_int_distribution<int> value_dist(0, 1);
+    std::uniform_int_distribution<int> x_dist(0, world_size_.w);
+    std::uniform_int_distribution<int> y_dist(0, world_size_.h);
+    std::uniform_int_distribution<int> r_dist(length * .5, length * 1.5);
+    for (int i = 0; i < iter; i++) {
+        float xo = x_dist(generator_);
+        float yo = y_dist(generator_);
+        float w = r_dist(generator_);
+        float h = r_dist(generator_);
+        float v = (float)value_dist(generator_);
+        for (int x = xo; x < xo + w; x++) {
+            for (int y = yo; y < yo + h; y++) {
+                state.set(x % world_size_.w, y % world_size_.h, Vec4<float>(v, 0.0, 0.0, 0.0);
+            }
+        }
+    }
+    glBindTexture(GL_TEXTURE_2D, front_buffer->texture());    
+    CHECK_GL_ERROR("glBindTexture");
+    glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, world_size_.w, world_size_.h, GL_RGBA, GL_FLOAT, state.data());    
+    CHECK_GL_ERROR("glTexSubImage2D");
 }
 
 

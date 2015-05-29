@@ -5,6 +5,7 @@
 // 
 
 #include <cstdlib>
+#include "log.h"
 #include "utils.h"
 
 namespace ca {
@@ -30,9 +31,9 @@ template <typename T> Buffer2D<T>::Buffer2D(Size s) : size_(s) {
 }
 
 template <typename T> Buffer2D<T>::Buffer2D(Buffer2D<T>& other) : size_(other.size()) {
-	const size_t mem_size = size_.w * size_.h * sizeof(T);
-	data_ = static_cast<T*>(malloc(mem_size));
-	memcpy(data_, other.data(), mem_size);
+    const size_t mem_size = size_.w * size_.h * sizeof(T);
+    data_ = static_cast<T*>(malloc(mem_size));
+    memcpy(data_, other.data(), mem_size);
 }
 
 template <typename T> Buffer2D<T>::~Buffer2D() {
@@ -40,21 +41,27 @@ template <typename T> Buffer2D<T>::~Buffer2D() {
 }
 
 template <typename T> const T& Buffer2D<T>::get(int x, int y) {
-	// TODO: check that x < size_.w, y < size_.h
-	return data_[x + (y * size_.w)];
+    if (x >= size_.w || y >= size_.h) {
+        LOG_ERROR("set failed, out of bounds");
+        return;
+    }
+    return data_[x + (y * size_.w)];
 }
 
 template <typename T> void Buffer2D<T>::set(int x, int y, const T& value) {
-	// TODO: check that x < size_.w, y < size_.h
-	data_[x + (y * size_.w)] = value;
+    if (x >= size_.w || y >= size_.h) {
+        LOG_ERROR("set failed, out of bounds");
+        return;
+    }
+    data_[x + (y * size_.w)] = value;
 }
 
 template <typename T> const Size& Buffer2D<T>::size() {
-	return size_;
+    return size_;
 }
 
 template <typename T> T* Buffer2D<T>::data() {
-	return data_;
+    return data_;
 }
 
 }  // namespace ca

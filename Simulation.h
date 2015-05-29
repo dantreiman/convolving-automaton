@@ -1,6 +1,7 @@
 #ifndef CONVOLVING_AUTOMATON_SIMULATION_H_
 #define CONVOLVING_AUTOMATON_SIMULATION_H_
 
+#include <random>
 #include "FFT.h"
 #include "FrameBufferRing.h"
 #include "gl_includes.h"
@@ -23,11 +24,11 @@ class Simulation {
 	void InitState();
 	
     Size world_size_;
-    FrameBuffer* kernels_;  // inner and outer kernel in (r,g) and (b,a) channels respectively
     FrameBuffer* kernels_fft_;
 	float inner_sum_;
 	float outer_sum_;
 
+    std::default_random_engine generator_;
 	FFT fft_;
 	FrameBufferRing state_ring_;
 };

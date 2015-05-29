@@ -1,7 +1,6 @@
 #ifndef CONVOLVING_AUTOMATON_RENDERER_H_
 #define CONVOLVING_AUTOMATON_RENDERER_H_
 
-#include <random>
 #include "FrameBuffer.h"
 #include "gl_includes.h"
 #include "Quad.h"
@@ -26,7 +25,6 @@ class Renderer {
  private:
     Size rtt_size_;
     GLuint default_framebuffer_;
-    std::default_random_engine generator_;
     std::unique_ptr<Shader> draw_shader_;
     GLuint vao_;
     // uniform locations
