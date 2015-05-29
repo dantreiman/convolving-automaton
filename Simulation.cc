@@ -5,6 +5,7 @@
 #include "Kernel.h"
 #include "log.h"
 #include "Vectors.h"
+#include "VertexArray.h"
 
 namespace ca {
 
@@ -13,6 +14,7 @@ Simulation::Simulation(const Size& world_size) : world_size_(world_size),
 }
 
 void Simulation::Init() {
+    LoadShaders();
     // InitKernels depends on FFT init being called first.
     fft_.Init();
     InitKernels();
@@ -21,12 +23,33 @@ void Simulation::Init() {
 
 void Simulation::Step() {
     FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
-    FrameBuffer * read = state_ring_.read_buffer();
-    FrameBuffer * write = state_ring_.write_buffer();
+    FrameBuffer* read = state_ring_.read_buffer();
+    FrameBuffer* write = state_ring_.write_buffer();
+    // Step 1: take fourier transform of the state
+    FrameBuffer* state_fft = fft_.Forward(read);
+    // Step 2: convolution
+    write->BindFrameBuffer();
+    glViewport(0, 0, world_size_.w, world_size_.h);
+    glUseProgram(convolve_shader_->program());
+    CHECK_GL_ERROR("glUseProgram");
+    // TODO: Premultiply kernels by scale factors
+    float scale = sqrtf(world_size_.w * world_size_.h);
+    glUniform2f(uniforms_.scale_location, scale/inner_sum_, scale/outer_sum_);
+    CHECK_GL_ERROR("glUniform2f");
+
+    glActiveTexture (GL_TEXTURE1);
+    glBindTexture (GL_TEXTURE_2D, kernels_fft()->texture());
+    glUniform1i(uniforms_.kernels_fft_tex_location, 1);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, state_fft->texture());
+    glUniform1i(uniforms_.state_fft_tex_location, 0);
+     
+    VertexArray::Default()->Bind();
+    VertexArray::Default()->Draw();
+    glUseProgram(0);
+    cache->RecycleBuffer(state_fft);
     
-    FrameBuffer * temp = cache->ReserveBuffer();
-    
-    cache->RecycleBuffer(temp);
     state_ring_.Rotate();
 }
 
@@ -39,9 +62,17 @@ void Simulation::UnlockRenderingBuffer(FrameBuffer* rendering_buffer) {
 }
 
 FrameBuffer* Simulation::kernels_fft() const {
-    return kernels_fft_;
+    return kernels_fft_.get();
 }
 
+void Simulation::LoadShaders() {
+    Shader * convolve_shader = new Shader("minimal", "convolve_par");
+    convolve_shader->Init(ShaderAttributes());
+    convolve_shader_.reset(convolve_shader);
+    uniforms_.scale_location = convolve_shader_->UniformLocation("scale");
+    uniforms_.state_fft_tex_location = convolve_shader_->UniformLocation("stateFFT");
+    uniforms_.kernels_fft_tex_location = convolve_shader_->UniformLocation("kernelsFFT");
+}
 
 void Simulation::InitKernels() {
     // Set up kernels
@@ -63,14 +94,14 @@ void Simulation::InitKernels() {
         }
     }
     FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
-    FrameBuffer* kernel_buffer = cache->ReserveBuffer();
-    glBindTexture(GL_TEXTURE_2D, kernel_buffer->texture());    
+    FrameBuffer* kernels_buffer = cache->ReserveBuffer();
+    glBindTexture(GL_TEXTURE_2D, kernels_buffer->texture());    
     CHECK_GL_ERROR("glBindTexture");
     glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, world_size_.w, world_size_.h, GL_RGBA, GL_FLOAT, kernels.data());    
     CHECK_GL_ERROR("glTexSubImage2D");
     // Compute the DFT of both kernels
-    kernels_fft_ = fft_.Forward(kernel_buffer);
-    cache->RecycleBuffer(kernel_buffer);
+    kernels_fft_.reset(fft_.Forward(kernels_buffer));
+    cache->RecycleBuffer(kernels_buffer);
 }
 
 

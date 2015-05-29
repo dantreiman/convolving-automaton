@@ -177,7 +177,7 @@ void FFT::GeneratePlan() {
 
 
 void FFT::LoadShader() {
-    Shader * shader = new Shader("fft2D_par");
+    Shader * shader = new Shader("minimal", "fft2D_par");
     shader->Init(ShaderAttributes());
     shader_.reset(shader);
     uniforms_.dimension_location = shader->UniformLocation("dimension");
@@ -187,14 +187,7 @@ void FFT::LoadShader() {
 }
 
 void FFT::Stage(int dimension, int stage, int inverse, FrameBuffer* src, FrameBuffer* dst) {
-    // Renaming variables to preserve copy-pasted code
-    const int NX = size_.w;
-    const int NY = size_.h;
-    const int BX = log2x_;
-    const int BY = log2y_;
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, dst->framebuffer());
-    CHECK_GL_ERROR("glBindFrameBuffer");
+    dst->BindFrameBuffer();
     glViewport(0, 0, size_.w, size_.h);
 
     glUseProgram(shader_->program());

@@ -7,6 +7,7 @@
 #include "gl_includes.h"
 #include "utils.h"
 #include "Renderer.h"
+#include "Shader.h"
 
 namespace ca {
 
@@ -27,8 +28,8 @@ class Simulation {
     
     /**
      * Get a buffer to render the most recent state of the simulation.
-	 * As soon as rendering is complete, the caller must pass the buffer
-	 * back into UnlockRenderingBuffer()
+     * As soon as rendering is complete, the caller must pass the buffer
+     * back into UnlockRenderingBuffer()
      */
     FrameBuffer* LockRenderingBuffer();
 
@@ -44,17 +45,25 @@ class Simulation {
     FrameBuffer* kernels_fft() const;
 
   private:
-	void InitKernels();
-	void InitState();
-	
+	void LoadShaders();
+    void InitKernels();
+    void InitState();
+    
     Size world_size_;
-    FrameBuffer* kernels_fft_;
-	float inner_sum_;
-	float outer_sum_;
+    std::unique_ptr<FrameBuffer> kernels_fft_;
+    float inner_sum_;
+    float outer_sum_;
 
     std::default_random_engine generator_;
-	FFT fft_;
-	FrameBufferRing state_ring_;
+    FFT fft_;
+    FrameBufferRing state_ring_;
+    
+    std::unique_ptr<Shader> convolve_shader_;
+    struct {
+	    GLint scale_location;
+        GLint kernels_fft_tex_location;
+        GLint state_fft_tex_location;
+    } uniforms_;
 };
 
 }  // namespace ca

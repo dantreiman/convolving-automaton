@@ -12,7 +12,7 @@ class Shader {
 	/**
 	 * Load a shader from shaders directory by name.
 	 */
-    Shader(const std::string& name);
+    Shader(const std::string& vert_name, const std::string& frag_name);
 
     /**
      * Compile and link the shader program.
@@ -27,7 +27,8 @@ class Shader {
 	bool Load();
 	bool Compile();
 	
-	std::string name_;
+	std::string vert_name_;
+	std::string frag_name_;
 	std::string vert_src_;
 	std::string frag_src_;
 	GLuint vertex_shader_;

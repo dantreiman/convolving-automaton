@@ -15,7 +15,7 @@ void Renderer::Init() {
     fprintf(LOGFILE, "OpenGL Version: %s\n", glGetString(GL_VERSION));
     fprintf(LOGFILE, "OpenGL Shader Language: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
  // Load default shader
-    Shader * draw_shader = new Shader("draw2D_new");
+    Shader * draw_shader = new Shader("minimal", "draw2D_new");
     draw_shader->Init(ShaderAttributes());
     draw_shader_.reset(draw_shader);
     uniform_stateTexture_ = draw_shader_->UniformLocation("stateTexture");

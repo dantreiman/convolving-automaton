@@ -9,5 +9,5 @@ void main()
     gl_Position.xy = position.xy;
     gl_Position.z = 0.0;
     gl_Position.w = 1.0;
-    texcoord = (position.xy + 1) / 2;
+    texcoord = (position.xy + 1.0) / 2.0;
 }

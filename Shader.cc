@@ -44,8 +44,8 @@ bool printProgramInfoLog(GLuint obj)
 
 namespace ca {
 
-Shader::Shader(const std::string& name) : name_(name) {
-}
+Shader::Shader(const std::string& vert_name, const std::string& frag_name) :
+    vert_name_(vert_name), frag_name_(frag_name) {}
 
 bool Shader::Init(const ShaderAttributes& attribute_bindings) {
     program_ = glCreateProgram();
@@ -73,7 +73,7 @@ const GLint Shader::UniformLocation(const GLchar* name) {
 }
 
 bool Shader::Load() {
-    std::string vert_path = "shaders/" + name_ + ".vert";
+    std::string vert_path = "shaders/" + vert_name_ + ".vert";
     std::ifstream vert_file(vert_path);
     vert_src_ = std::string((std::istreambuf_iterator<char>(vert_file)), std::istreambuf_iterator<char>());
     vertex_shader_ = glCreateShader (GL_VERTEX_SHADER);
@@ -82,7 +82,7 @@ bool Shader::Load() {
     glShaderSource(vertex_shader_, 1, &vert_src_cstring, NULL);
     CHECK_GL_ERROR("glShaderSource");
     
-    std::string frag_path = "shaders/" + name_ + ".frag";
+    std::string frag_path = "shaders/" + frag_name_ + ".frag";
     std::ifstream frag_file(frag_path);
     frag_src_ = std::string((std::istreambuf_iterator<char>(frag_file)), std::istreambuf_iterator<char>());
     fragment_shader_ = glCreateShader (GL_FRAGMENT_SHADER);

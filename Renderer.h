@@ -3,7 +3,6 @@
 
 #include "FrameBuffer.h"
 #include "gl_includes.h"
-#include "Quad.h"
 #include "Shader.h"
 #include "utils.h"
 
