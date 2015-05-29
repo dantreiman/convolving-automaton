@@ -45,7 +45,6 @@ class FFT {
     int log2y_;
 	GLuint plan_[MP2];
     std::unique_ptr<Shader> shader_;
-    GLuint vao_;
     struct {
         GLint dimension_location;
         GLint inverse_location;

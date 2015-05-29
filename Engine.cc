@@ -37,7 +37,7 @@ void Engine::Init() {
         width  = mode->width;
         height = mode->height;
     }
-	
+    
     window_ = glfwCreateWindow(width, height, "ConvolvingAutomaton", monitor_, NULL);
     if (!window_) {
         fprintf(stderr, "Failed to create GLFW window\n");
@@ -75,6 +75,9 @@ void Engine::RunLoop() {
 
     while (!glfwWindowShouldClose(window_)) {
         //float t = glfwGetTime();
+        // For now, simulation and rendering run in same thread
+        // TODO: run simulation async, lock state buffer when its time to draw.
+        simulation_.Step();
         FrameBuffer* state = simulation_.GetStateBuffer();
         renderer_.DrawState(window_, state);
         glfwSwapBuffers(window_);

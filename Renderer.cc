@@ -47,25 +47,6 @@ void Renderer::Init() {
     //                       BUFFER_OFFSET(0));   // What is the offset in the VBO to the position data?
 }
 
-void Renderer::RandomRects(GLFWwindow* window, float length, int iter) {
-    // glEnableClientState(GL_VERTEX_ARRAY);
-    //     std::uniform_int_distribution<int> x_dist(0, rtt_size_.w);
-    //     std::uniform_int_distribution<int> y_dist(0, rtt_size_.h);
-    //     std::uniform_int_distribution<int> r_dist(length * .5, length * 1.5);
-    //     
-    //     // glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    //     for (int i = 0; i < iter; i++) {
-    //         float x = x_dist(generator_);
-    //         float y = y_dist(generator_);
-    //         float w = r_dist(generator_);
-    //         float h = r_dist(generator_);
-    //  Quad quad(x, y, w, h);
-    //  glVertexPointer(2, GL_INT, 0, quad.vertices);
-    //  glDrawArrays(GL_TRIANGLE_STRIP, 0, 2);
-    //     }
-    // glDisableClientState(GL_VERTEX_ARRAY);
-}
-
 void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
 	Size frame_size;
 	glBindFramebuffer(GL_FRAMEBUFFER, default_framebuffer_);

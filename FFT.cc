@@ -4,7 +4,7 @@
 #include <cmath>
 #include "FrameBufferCache.h"
 #include "log.h"
-#include "Quad.h"
+#include "VertexArray.h"
 
 #define LOG_FFT_PERFORMANCE 0
 
@@ -184,27 +184,6 @@ void FFT::LoadShader() {
     uniforms_.inverse_location = shader->UniformLocation("inverse");
     uniforms_.state_tex_location = shader->UniformLocation("stateTex");
     uniforms_.plan_tex_location = shader->UniformLocation("planTex");
-    // Create a VAO
-    Quad quad = Quad(-1, -1, 2, 2);
-    glGenVertexArrays(1, &vao_);
-    CHECK_GL_ERROR("glGenVertexArrays");
-    glBindVertexArray(vao_);
-    CHECK_GL_ERROR("glBindVertexArray");
-    GLuint posBufferName;
-    glGenBuffers(1, &posBufferName);
-    CHECK_GL_ERROR("glGenBuffers");
-    glBindBuffer(GL_ARRAY_BUFFER, posBufferName);
-    CHECK_GL_ERROR("glBindBuffer");
-    glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), &quad.vertices[0], GL_STATIC_DRAW);
-    CHECK_GL_ERROR("glBufferData");
-    glEnableVertexAttribArray(POS_ATTRIB_LOCATION);
-    CHECK_GL_ERROR("glEnableVertexAttribArray");
-    glVertexAttribIPointer(POS_ATTRIB_LOCATION,
-                           2,
-                           GL_INT,
-                           0,
-                           BUFFER_OFFSET(0));
-    CHECK_GL_ERROR("glVertexAttribIPointer");
 }
 
 void FFT::Stage(int dimension, int stage, int inverse, FrameBuffer* src, FrameBuffer* dst) {
@@ -232,12 +211,8 @@ void FFT::Stage(int dimension, int stage, int inverse, FrameBuffer* src, FrameBu
     glBindTexture(GL_TEXTURE_2D, src->texture());
     glUniform1i(uniforms_.state_tex_location, 0);
      
-    //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dst->texture(), 0);
-
-    glBindVertexArray(vao_);
-    CHECK_GL_ERROR("glBindVertexArray");
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    CHECK_GL_ERROR("glDrawArrays");
+    VertexArray::Default()->Bind();
+    VertexArray::Default()->Draw();
     
     glUseProgram(0);
 }

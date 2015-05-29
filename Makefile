@@ -5,11 +5,13 @@ SRCS =  main.cc \
 		FFT.cc \
 		FrameBuffer.cc \
 		FrameBufferCache.cc \
+		FrameBufferRing.cc \
 		Kernel.cc \
 		Renderer.cc \
 		Simulation.cc \
 		Shader.cc \
 		ShaderAttributes.cc \
+		VertexArray.cc \
 		glfw-3.1.1/build/src/libglfw3.a
 
 LINKER_FLAGS = -lc++

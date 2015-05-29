@@ -19,8 +19,6 @@ class Renderer {
    */
   void Init();
 
-  void RandomRects(GLFWwindow* window, float length, int iter);
-
   void DrawState(GLFWwindow* window, const FrameBuffer* state);
 
   void Resize(int width, int height);
