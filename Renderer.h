@@ -26,7 +26,6 @@ class Renderer {
     Size rtt_size_;
     GLuint default_framebuffer_;
     std::unique_ptr<Shader> draw_shader_;
-    GLuint vao_;
     // uniform locations
     GLint uniform_stateTexture_;
 };
