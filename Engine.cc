@@ -78,8 +78,9 @@ void Engine::RunLoop() {
         // For now, simulation and rendering run in same thread
         // TODO: run simulation async, lock state buffer when its time to draw.
         simulation_.Step();
-        FrameBuffer* state = simulation_.GetStateBuffer();
+        FrameBuffer* state = simulation_.LockRenderingBuffer();
         renderer_.DrawState(window_, state);
+        simulation_.UnlockRenderingBuffer(state);
         glfwSwapBuffers(window_);
         glfwPollEvents();
     }

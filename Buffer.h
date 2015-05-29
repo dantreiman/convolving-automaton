@@ -4,6 +4,7 @@
 // Represents a 2-dimensional contiguous array of values, like a bitmap
 // 
 
+#include <algorithm>
 #include <cstdlib>
 #include "log.h"
 #include "utils.h"
@@ -42,8 +43,9 @@ template <typename T> Buffer2D<T>::~Buffer2D() {
 
 template <typename T> const T& Buffer2D<T>::get(int x, int y) {
     if (x >= size_.w || y >= size_.h) {
-        LOG_ERROR("set failed, out of bounds");
-        return;
+        LOG_ERROR("get out of bounds, clamping to edge");
+        x = std::max(x, size_.w - 1);
+        y = std::max(y, size_.h - 1);
     }
     return data_[x + (y * size_.w)];
 }

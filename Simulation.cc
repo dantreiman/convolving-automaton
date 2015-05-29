@@ -9,7 +9,6 @@
 namespace ca {
 
 Simulation::Simulation(const Size& world_size) : world_size_(world_size),
-                                                 kernels_(NULL),
                                                  fft_(world_size) {
 }
 
@@ -21,13 +20,21 @@ void Simulation::Init() {
 }
 
 void Simulation::Step() {
-    
+    state_ring_.Rotate();
 }
 
-FrameBuffer* Simulation::GetStateBuffer() const {
-    // TODO: actually return the current unused state buffer
-    return kernels_fft_;
+FrameBuffer* Simulation::LockRenderingBuffer() {
+    return state_ring_.RemoveIdle();
 }
+
+void Simulation::UnlockRenderingBuffer(FrameBuffer* rendering_buffer) {
+    state_ring_.Add(rendering_buffer);
+}
+
+FrameBuffer* Simulation::kernels_fft() const {
+	return kernels_fft_;
+}
+
 
 void Simulation::InitKernels() {
     // Set up kernels
@@ -85,7 +92,7 @@ void Simulation::InitState() {
         float v = (float)value_dist(generator_);
         for (int x = xo; x < xo + w; x++) {
             for (int y = yo; y < yo + h; y++) {
-                state.set(x % world_size_.w, y % world_size_.h, Vec4<float>(v, 0.0, 0.0, 0.0);
+                state.set(x % world_size_.w, y % world_size_.h, Vec4<float>(v, 0.0, 0.0, 0.0));
             }
         }
     }

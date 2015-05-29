@@ -13,11 +13,35 @@ namespace ca {
 class Simulation {
   public:
     Simulation(const Size& world_size);
+
+    /**
+     * Initialize the simluation.
+     * Requires a valid OpenGL context.
+     */
     void Init();
   
+    /**
+     * Advance the state of the simulation by one timestep.
+     */
     void Step();
-    // temp
-    FrameBuffer* GetStateBuffer() const;
+    
+    /**
+     * Get a buffer to render the most recent state of the simulation.
+	 * As soon as rendering is complete, the caller must pass the buffer
+	 * back into UnlockRenderingBuffer()
+     */
+    FrameBuffer* LockRenderingBuffer();
+
+    /**
+     * Call this as soon as a rendering pass is complete to put the
+     * buffer back in rotation.
+     */
+    void UnlockRenderingBuffer(FrameBuffer* rendering_buffer);
+
+    /**
+     * Returns a pointer to the buffer containing the fourier-transformed kernels.
+     */
+    FrameBuffer* kernels_fft() const;
 
   private:
 	void InitKernels();
