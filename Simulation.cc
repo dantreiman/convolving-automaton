@@ -20,6 +20,13 @@ void Simulation::Init() {
 }
 
 void Simulation::Step() {
+    FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
+    FrameBuffer * read = state_ring_.read_buffer();
+    FrameBuffer * write = state_ring_.write_buffer();
+    
+    FrameBuffer * temp = cache->ReserveBuffer();
+    
+    cache->RecycleBuffer(temp);
     state_ring_.Rotate();
 }
 
@@ -32,7 +39,7 @@ void Simulation::UnlockRenderingBuffer(FrameBuffer* rendering_buffer) {
 }
 
 FrameBuffer* Simulation::kernels_fft() const {
-	return kernels_fft_;
+    return kernels_fft_;
 }
 
 
@@ -78,13 +85,13 @@ void Simulation::InitState() {
     FrameBuffer * front_buffer = state_ring_.read_buffer();
     Buffer2D<Vec4<float>> state(world_size_);
     
-    const float length = 10;
-    const float iter = 100;
+    const float length = 32;
+    const int iterations = 100;
     std::uniform_int_distribution<int> value_dist(0, 1);
     std::uniform_int_distribution<int> x_dist(0, world_size_.w);
     std::uniform_int_distribution<int> y_dist(0, world_size_.h);
     std::uniform_int_distribution<int> r_dist(length * .5, length * 1.5);
-    for (int i = 0; i < iter; i++) {
+    for (int i = 0; i < iterations; i++) {
         float xo = x_dist(generator_);
         float yo = y_dist(generator_);
         float w = r_dist(generator_);
@@ -101,6 +108,5 @@ void Simulation::InitState() {
     glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, world_size_.w, world_size_.h, GL_RGBA, GL_FLOAT, state.data());    
     CHECK_GL_ERROR("glTexSubImage2D");
 }
-
 
 }  // namespace ca
