@@ -80,7 +80,7 @@ FrameBuffer* FFT::Forward(FrameBuffer* src) {
 }
 
 FrameBuffer* FFT::Inverse(FrameBuffer* src) {
-	FrameBufferCache * cache = FrameBufferCache::sharedCache(size_);
+    FrameBufferCache * cache = FrameBufferCache::sharedCache(size_);
     FrameBuffer* temp1 = cache->ReserveBuffer();
     FrameBuffer* temp2 = cache->ReserveBuffer();
     FrameBuffer* read = src;
@@ -101,7 +101,6 @@ FrameBuffer* FFT::Inverse(FrameBuffer* src) {
 void FFT::GeneratePlanTextures() {
     const int n = size_.w;
     const int b = log2x_;
-                
     glGenTextures (b, &plan_[0]);
     CHECK_GL_ERROR("glGenTextures");
     for (int stage = 0; stage < b; stage++) {
@@ -118,24 +117,23 @@ void FFT::GeneratePlanTextures() {
 void FFT::GeneratePlan() {
     const int s = size_.w;
     const int b = log2x_;
+    // Butterflys butterflys: I was really high when I wrote this.
     Butterfly butterfly[s * b];
     int n = 0;
-    for(unsigned int i = 0; i < b; ++i)
+    for (int i = 0; i < b; ++i)
     {
         int blocks = 1<<(b - 1 - i);
         int block_inputs = 1<<i;
-        for(int j = 0; j < blocks; ++j) {
-            for(int k = 0; k < block_inputs; ++k) {
+        for (int j = 0; j < blocks; ++j) {
+            for (int k = 0; k < block_inputs; ++k) {
                 int i1 = j*block_inputs*2 + k;
                 int i2 = i1 + block_inputs;
                 float j1, j2;
-                if(i == 0)
-                {
+                if (i == 0) {
                     j1 = static_cast<float>(bit_reverse(i1, s));
                     j2 = static_cast<float>(bit_reverse(i2, s));
                 }
-                else
-                {
+                else {
                     j1 = static_cast<float>(i1);
                     j2 = static_cast<float>(i2);
                 }

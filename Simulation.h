@@ -45,7 +45,7 @@ class Simulation {
     FrameBuffer* kernels_fft() const;
 
   private:
-	void LoadShaders();
+    void LoadShaders();
     void InitKernels();
     void InitState();
     
@@ -59,10 +59,24 @@ class Simulation {
     FrameBufferRing state_ring_;
     
     std::unique_ptr<Shader> convolve_shader_;
+    std::unique_ptr<Shader> sigmoid_shader_;
     struct {
-	    GLint scale_location;
+        float inner_radius;
+        float outer_radius;
+        float b1, b2;
+        float d1, d2;
+        float alphan;
+        float alpham;
+        float dt;
+    } sl_parameters_;
+    struct {
+        // convolve_par.frag
+        GLint scale_location;
         GLint kernels_fft_tex_location;
         GLint state_fft_tex_location;
+        // sigmoid.frag
+        GLint integral_tex_location;
+        GLint state_tex_location;
     } uniforms_;
 };
 

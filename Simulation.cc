@@ -11,6 +11,15 @@ namespace ca {
 
 Simulation::Simulation(const Size& world_size) : world_size_(world_size),
                                                  fft_(world_size) {
+    sl_parameters_.inner_radius = 4;
+    sl_parameters_.outer_radius = 12;
+    sl_parameters_.b1 = 0.305;
+    sl_parameters_.b2 = 0.443;
+    sl_parameters_.d1 = 0.556;
+    sl_parameters_.d2 = 0.814;
+    sl_parameters_.alphan = 0.028;
+    sl_parameters_.alpham = 0.147;
+    sl_parameters_.dt = 0.05;
 }
 
 void Simulation::Init() {
@@ -36,20 +45,35 @@ void Simulation::Step() {
     float scale = sqrtf(world_size_.w * world_size_.h);
     glUniform2f(uniforms_.scale_location, scale/inner_sum_, scale/outer_sum_);
     CHECK_GL_ERROR("glUniform2f");
-
     glActiveTexture (GL_TEXTURE1);
     glBindTexture (GL_TEXTURE_2D, kernels_fft()->texture());
     glUniform1i(uniforms_.kernels_fft_tex_location, 1);
-
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, state_fft->texture());
     glUniform1i(uniforms_.state_fft_tex_location, 0);
-     
     VertexArray::Default()->Bind();
     VertexArray::Default()->Draw();
-    glUseProgram(0);
     cache->RecycleBuffer(state_fft);
-    
+    // 'write' now contains the products of state with kernels
+    // in the frequency domain.
+    // Step 3: Parallel inverse fourier transform
+    FrameBuffer * nm = fft_.Inverse(write);
+    // Step 4: Compute derivative and apply
+    write->BindFrameBuffer();
+    glViewport(0, 0, world_size_.w, world_size_.h);
+    glUseProgram(sigmoid_shader_->program());
+    CHECK_GL_ERROR("glUseProgram");
+    glActiveTexture (GL_TEXTURE1);
+    glBindTexture (GL_TEXTURE_2D, read->texture());
+    glUniform1i(uniforms_.state_tex_location, 1);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, nm->texture());
+    glUniform1i(uniforms_.integral_tex_location, 0);
+    VertexArray::Default()->Bind();
+    VertexArray::Default()->Draw();
+    cache->RecycleBuffer(nm);
+    glUseProgram(0);
+    // Done, new state at t+dt is in write buffer.
     state_ring_.Rotate();
 }
 
@@ -72,15 +96,36 @@ void Simulation::LoadShaders() {
     uniforms_.scale_location = convolve_shader_->UniformLocation("scale");
     uniforms_.state_fft_tex_location = convolve_shader_->UniformLocation("stateFFT");
     uniforms_.kernels_fft_tex_location = convolve_shader_->UniformLocation("kernelsFFT");
+
+    Shader * sigmoid_shader = new Shader("minimal", "sigmoid");
+    sigmoid_shader->Init(ShaderAttributes());
+    sigmoid_shader_.reset(sigmoid_shader);
+    GLint integral_tex_location;
+    GLint state_tex_location;
+    uniforms_.integral_tex_location = sigmoid_shader_->UniformLocation("integralTexture");
+    uniforms_.state_tex_location = sigmoid_shader_->UniformLocation("stateTexture");
+    // TODO: make these parameters variable
+    glUseProgram(sigmoid_shader_->program());
+    CHECK_GL_ERROR("glUseProgram");
+    glUniform1f(sigmoid_shader_->UniformLocation("b1"), sl_parameters_.b1);
+    glUniform1f(sigmoid_shader_->UniformLocation("b2"), sl_parameters_.b2);
+    glUniform1f(sigmoid_shader_->UniformLocation("d1"), sl_parameters_.d1);
+    glUniform1f(sigmoid_shader_->UniformLocation("d2"), sl_parameters_.d2);
+    glUniform1f(sigmoid_shader_->UniformLocation("sn"), sl_parameters_.alphan);
+    glUniform1f(sigmoid_shader_->UniformLocation("sm"), sl_parameters_.alpham);
+    glUniform1f(sigmoid_shader_->UniformLocation("dt"), sl_parameters_.dt);
+    CHECK_GL_ERROR("glUniform1f");
+	glUseProgram(0);
 }
 
 void Simulation::InitKernels() {
     // Set up kernels
     Buffer2D<float> inner_kernel(world_size_);
-    float inner_sum_ = CircularKernel(&inner_kernel, 7, 1);
+    float inner_sum_ = CircularKernel(&inner_kernel, sl_parameters_.inner_radius, 1);
     Buffer2D<float> outer_kernel(world_size_);
-    float outer_sum_ = RingKernel(&outer_kernel, 7, 20, 1);
-    
+    float outer_sum_ = RingKernel(&outer_kernel,
+                                   sl_parameters_.inner_radius,
+                                   sl_parameters_.outer_radius, 1);
     Buffer2D<Vec4<float>> kernels(world_size_);
     Size half_size = Size(world_size_.w / 2, world_size_.h / 2);
     for (int x = 0; x < world_size_.w; x++) {

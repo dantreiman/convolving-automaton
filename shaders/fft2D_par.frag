@@ -1,4 +1,9 @@
 #version 330 core
+//
+// Computes two DFTs at once.
+// stateTex should contain two interleaved complex buffers.
+// r+gi and b+ai
+//
 
 layout(location = 0) out vec4 fragColor;
 
