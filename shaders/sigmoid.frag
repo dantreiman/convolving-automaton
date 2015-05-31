@@ -37,6 +37,6 @@ void main() {
     float deriv = sigmoid_ab(n, sigmoid_mix (b1, d1, m), sigmoid_mix (b2, d2, m));
     //float st1 = st0;// + (deriv * dt);
     //fragColor = vec4(clamp(st1 * 2 - 1, 0, 1), 0.0, 0.0, 0.0);
-    fragColor = vec4(clamp(deriv, 0, 1), 0.0, 0.0, 0.0);
-
+    //fragColor = vec4(clamp(texcoord.x, 0, 1), 0.0, 0.0, 0.0);
+    fragColor = vec4(n, 0, m, 0);
 }

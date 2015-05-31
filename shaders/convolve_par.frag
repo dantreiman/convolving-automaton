@@ -10,10 +10,10 @@ uniform sampler2D kernelsFFT;
 
 void main()
 {
-    vec4 a = texture(stateFFT, texcoord);
-    vec4 b = texture(kernelsFFT, texcoord) * scale.xxyy;
+    vec2 a = texture(stateFFT, texcoord).rg;
+    vec4 b = texture(kernelsFFT, texcoord);// * scale.xxyy;
     fragColor.r = a.r*b.r - a.g*b.g;
     fragColor.g = a.r*b.g + a.g*b.r;
-    fragColor.b = a.b*b.b - a.a*b.a;
-    fragColor.a = a.b*b.a + a.a*b.b;
+    fragColor.b = a.r*b.b - a.g*b.a;
+    fragColor.a = a.r*b.a + a.g*b.b;
 }
