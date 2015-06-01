@@ -7,7 +7,7 @@ namespace {
 float func_linear (float x, float a, float b) {
     if (x < a - b / 2.0) return 0.0;
     else if (x > a + b / 2.0) return 1.0;
-	else return (x - a + b / 2.0) / b;
+    else return (x - a + b / 2.0) / b;
 }
     
 }

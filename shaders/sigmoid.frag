@@ -40,10 +40,7 @@ void main() {
     vec4 integrals = texture(integralTexture, texcoord);
     float m = integrals.r;
     float n = integrals.b;
-    float deriv = 2*snm(n, m) - 1;
-    //float deriv = 2*snm(texcoord.x, m) - 1;
+    float deriv = 2 * snm(n, m) - 1;
     float st1 = st0 + (deriv * dt);
-    // fragColor = vec4(2*snm(texcoord.x, texcoord.y) - 1, 0, 0, 0);
-    // fragColor = vec4(clamp(st1, 0, 1), 0, 0, 1);
-    fragColor = vec4(clamp(st1, 0, 1), 0, 0, 1);
+    fragColor = vec4(clamp(st1, 0, 1), 0, 0, 0);
 }

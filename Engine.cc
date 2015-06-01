@@ -72,7 +72,6 @@ void Engine::Init() {
 
 void Engine::RunLoop() {
     srand ((unsigned)glfwGetTime());
-    simulation_.Step();
     while (!glfwWindowShouldClose(window_)) {
         //float t = glfwGetTime();
         // For now, simulation and rendering run in same thread
@@ -87,7 +86,6 @@ void Engine::RunLoop() {
     }
 
     // thrd_join(physics_thread, NULL);
-
     glfwDestroyWindow(window_);
     glfwTerminate();
 }

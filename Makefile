@@ -11,6 +11,7 @@ SRCS =  main.cc \
 		Simulation.cc \
 		Shader.cc \
 		ShaderAttributes.cc \
+		StopWatch.cc \
 		VertexArray.cc \
 		glfw-3.1.1/build/src/libglfw3.a
 

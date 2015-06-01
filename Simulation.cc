@@ -4,6 +4,7 @@
 #include "FrameBufferCache.h"
 #include "Kernel.h"
 #include "log.h"
+#include "StopWatch.h"
 #include "Vectors.h"
 #include "VertexArray.h"
 
@@ -32,11 +33,13 @@ void Simulation::Init() {
 }
 
 void Simulation::Step() {
+    // StopWatch stop_watch("Simulation::Step");
     FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
     FrameBuffer* read = state_ring_.read_buffer();
     FrameBuffer* write = state_ring_.write_buffer();
     // Step 1: take fourier transform of the state
     FrameBuffer* state_fft = fft_.Forward(read);
+    // stop_watch.Mark("fft.Forward");
     // Step 2: convolution
     write->BindFrameBuffer();
     glViewport(0, 0, world_size_.w, world_size_.h);
@@ -54,10 +57,12 @@ void Simulation::Step() {
     VertexArray::Default()->Bind();
     VertexArray::Default()->Draw();
     cache->RecycleBuffer(state_fft);
+    // stop_watch.Mark("convolve shader");
     // 'write' now contains the products of state with kernels
     // in the frequency domain.
     // Step 3: Parallel inverse fourier transform
     FrameBuffer * nm = fft_.Inverse(write);
+    // stop_watch.Mark("fft.Inverse");
     // Step 4: Compute derivative and apply
     write->BindFrameBuffer();
     glViewport(0, 0, world_size_.w, world_size_.h);
@@ -72,9 +77,11 @@ void Simulation::Step() {
     VertexArray::Default()->Bind();
     VertexArray::Default()->Draw();
     cache->RecycleBuffer(nm);
+    // stop_watch.Mark("sigmoid shader");
     glUseProgram(0);
     // Done, new state at t+dt is in write buffer.
     state_ring_.Rotate();
+    // std::cout << stop_watch.Report();
 }
 
 FrameBuffer* Simulation::LockRenderingBuffer() {
