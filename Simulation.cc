@@ -13,13 +13,14 @@ Simulation::Simulation(const Size& world_size) : world_size_(world_size),
                                                  fft_(world_size) {
     sl_parameters_.inner_radius = 4;
     sl_parameters_.outer_radius = 12;
+    sl_parameters_.border = 1;
     sl_parameters_.b1 = 0.305;
     sl_parameters_.b2 = 0.443;
     sl_parameters_.d1 = 0.556;
     sl_parameters_.d2 = 0.814;
     sl_parameters_.alphan = 0.028;
     sl_parameters_.alpham = 0.147;
-    sl_parameters_.dt = 0.05;
+    sl_parameters_.dt = 0.089;
 }
 
 void Simulation::Init() {
@@ -41,9 +42,8 @@ void Simulation::Step() {
     glViewport(0, 0, world_size_.w, world_size_.h);
     glUseProgram(convolve_shader_->program());
     CHECK_GL_ERROR("glUseProgram");
-    // TODO: Premultiply kernels by scale factors
-    float scale = sqrtf(world_size_.w * world_size_.h);
-    glUniform2f(uniforms_.scale_location, scale/inner_sum_, scale/outer_sum_);
+    // TODO: Premultiply kernels by scale factor
+    glUniform2f(uniforms_.scale_location, 1./inner_sum_, 1./outer_sum_);
     CHECK_GL_ERROR("glUniform2f");
     glActiveTexture (GL_TEXTURE1);
     glBindTexture (GL_TEXTURE_2D, kernels_fft()->texture());
@@ -115,17 +115,20 @@ void Simulation::LoadShaders() {
     glUniform1f(sigmoid_shader_->UniformLocation("sm"), sl_parameters_.alpham);
     glUniform1f(sigmoid_shader_->UniformLocation("dt"), sl_parameters_.dt);
     CHECK_GL_ERROR("glUniform1f");
-	glUseProgram(0);
+    glUseProgram(0);
 }
 
 void Simulation::InitKernels() {
     // Set up kernels
     Buffer2D<float> inner_kernel(world_size_);
-    float inner_sum_ = CircularKernel(&inner_kernel, sl_parameters_.inner_radius, 1);
+    inner_sum_ = CircularKernel(&inner_kernel,
+                                sl_parameters_.inner_radius,
+                                sl_parameters_.border);
     Buffer2D<float> outer_kernel(world_size_);
-    float outer_sum_ = RingKernel(&outer_kernel,
-                                   sl_parameters_.inner_radius,
-                                   sl_parameters_.outer_radius, 1);
+    outer_sum_ = RingKernel(&outer_kernel,
+                             sl_parameters_.inner_radius,
+                             sl_parameters_.outer_radius,
+                            sl_parameters_.border);
     Buffer2D<Vec4<float>> kernels(world_size_);
     Size half_size = Size(world_size_.w / 2, world_size_.h / 2);
     for (int x = 0; x < world_size_.w; x++) {
@@ -149,7 +152,6 @@ void Simulation::InitKernels() {
     cache->RecycleBuffer(kernels_buffer);
 }
 
-
 void Simulation::InitState() {
     // Set up state ring buffer
     FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
@@ -161,7 +163,7 @@ void Simulation::InitState() {
     FrameBuffer * front_buffer = state_ring_.read_buffer();
     Buffer2D<Vec4<float>> state(world_size_);
     
-    const float length = 32;
+    const float length = 40;
     const int iterations = 100;
     std::uniform_int_distribution<int> value_dist(0, 1);
     std::uniform_int_distribution<int> x_dist(0, world_size_.w);

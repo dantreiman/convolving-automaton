@@ -4,11 +4,10 @@
 
 namespace {
 
-float func_linear (float x, float a, float ea)
-{
-    if (x < a - ea / 2.0) return 0.0;
-    else if (x > a + ea / 2.0) return 1.0;
-    else return (x -a ) / ea + 0.5;
+float func_linear (float x, float a, float b) {
+    if (x < a - b / 2.0) return 0.0;
+    else if (x > a + b / 2.0) return 1.0;
+	else return (x - a + b / 2.0) / b;
 }
     
 }
@@ -20,15 +19,15 @@ float CircularKernel(Buffer2D<float> *buffer,
                      float radius,
                      float border) {
     const Size& size = buffer->size();
-	const int tx = size.w / 2;
-	const int ty = size.h / 2;
+    const int tx = size.w / 2;
+    const int ty = size.h / 2;
     float sum = 0;
     for (int y = 0; y < size.h; y++) {
-		for (int x = 0; x < size.w; x++) {
+        for (int x = 0; x < size.w; x++) {
             const float d = hypotf(x - tx, y - ty);
-			const float value = 1 - func_linear(d, radius, border);
+            const float value = 1 - func_linear(d, radius, border);
             buffer->set(x, y, value);
-			sum += value;
+            sum += value;
         }
     }
     return sum;

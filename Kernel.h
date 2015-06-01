@@ -16,7 +16,6 @@ float RingKernel(Buffer2D<float> * buffer,
                 float outer_radius,
                 float border);
 
-
 }  // namespace ca
 
 #endif  // CONVOLVING_AUTOMATON_KERNEL_H_
