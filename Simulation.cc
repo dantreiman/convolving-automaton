@@ -199,7 +199,7 @@ void Simulation::InitState() {
     Buffer2D<Vec4<float>> state(world_size_);
     
     const float length = 40;
-    const int iterations = 100;
+    const int iterations = 400;
     std::uniform_int_distribution<int> value_dist(0, 1);
     std::uniform_int_distribution<int> x_dist(0, world_size_.w);
     std::uniform_int_distribution<int> y_dist(0, world_size_.h);
