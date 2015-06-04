@@ -21,7 +21,7 @@ vec3 hsv2rgb(vec3 c)
 void main()
 {
     float value = texture(stateTexture, texcoord).r;
-    float hue = mod(value * 1.5 + .2, 1.0);
+    float hue = mod(value * value, 1.0);
     vec3 hsv = vec3(hue,
                     1.0,
                     sqrt(value));
