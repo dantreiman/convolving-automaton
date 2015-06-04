@@ -46,7 +46,7 @@ FFT::FFT(const Size& size) : size_(size) {
 void FFT::Init() {
     GeneratePlanTextures();
     GeneratePlan();
-    LoadShader();
+    LoadShaders();
 }
 
 FrameBuffer* FFT::Forward(FrameBuffer* src) {
@@ -179,7 +179,7 @@ void FFT::GeneratePlan() {
     }
 } 
 
-void FFT::LoadShader() {
+void FFT::LoadShaders() {
     Shader * forward_shader = new Shader("minimal", "fft2D_forward_par");
     forward_shader->Init(ShaderAttributes());
     forward_shader_.reset(forward_shader);
