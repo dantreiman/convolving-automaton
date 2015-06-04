@@ -98,6 +98,19 @@ void Simulation::Step() {
     // std::cout << stop_watch.Report();
 }
 
+void Simulation::TestPerformance() {
+    StopWatch stop_watch("Simulation::Step");
+    FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
+    FrameBuffer* read = state_ring_.read_buffer();
+    for (int i = 0; i < 100; i++) {
+        FrameBuffer* state_fft = fft_.Forward(read);
+        cache->RecycleBuffer(state_fft);
+    }
+    glFlush();
+    stop_watch.Mark("fft.Forward x 100");
+    std::cout << stop_watch.Report();
+}
+
 FrameBuffer* Simulation::LockRenderingBuffer() {
     return state_ring_.RemoveIdle();
 }

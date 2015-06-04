@@ -90,4 +90,11 @@ void Engine::RunLoop() {
     glfwTerminate();
 }
 
+void Engine::TestPerformance() {
+    simulation_.TestPerformance();
+    glfwSwapBuffers(window_);
+    glfwDestroyWindow(window_);
+    glfwTerminate();
+}
+
 } // namespace ca

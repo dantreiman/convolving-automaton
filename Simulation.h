@@ -27,6 +27,11 @@ class Simulation {
     void Step();
     
     /**
+     * Run shader performance tests.
+     */
+    void TestPerformance();
+
+    /**
      * Get a buffer to render the most recent state of the simulation.
      * As soon as rendering is complete, the caller must pass the buffer
      * back into UnlockRenderingBuffer()

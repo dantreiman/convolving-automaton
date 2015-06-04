@@ -19,6 +19,8 @@ class Engine {
   
   void RunLoop();
 
+  void TestPerformance();
+
  private:
   GLFWwindow* window_;
   GLFWmonitor* monitor_;
