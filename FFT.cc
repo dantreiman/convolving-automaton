@@ -50,7 +50,7 @@ void FFT::Init() {
 }
 
 FrameBuffer* FFT::Forward(FrameBuffer* src) {
-    FrameBufferCache * cache = FrameBufferCache::sharedCache(size_);
+    FrameBufferCache* cache = FrameBufferCache::sharedCache(size_);
     FrameBuffer* temp1 = cache->ReserveBuffer();
     FrameBuffer* temp2 = cache->ReserveBuffer();
     FrameBuffer* read = src;
@@ -61,7 +61,7 @@ FrameBuffer* FFT::Forward(FrameBuffer* src) {
     glUniform1i(uniforms_.dimension_location, 0);
     CHECK_GL_ERROR("glUniform1i");
     for (int x_stage = 0; x_stage < log2x_; x_stage++) {
-        Stage(x_stage, 0, read, write);
+        Stage(x_stage, read, write);
         if (read == src) { read = temp2; } // Read from src on the 1st stage
         std::swap(read, write);
     }
@@ -69,7 +69,7 @@ FrameBuffer* FFT::Forward(FrameBuffer* src) {
     glUniform1i(uniforms_.dimension_location, 1);
     CHECK_GL_ERROR("glUniform1i");
     for (int y_stage = 0; y_stage < log2y_; y_stage++) {
-        Stage(y_stage, 0, read, write);
+        Stage(y_stage, read, write);
         std::swap(read, write);
     }
     cache->RecycleBuffer(write);
@@ -78,7 +78,7 @@ FrameBuffer* FFT::Forward(FrameBuffer* src) {
 }
 
 FrameBuffer* FFT::Inverse(FrameBuffer* src) {
-    FrameBufferCache * cache = FrameBufferCache::sharedCache(size_);
+    FrameBufferCache* cache = FrameBufferCache::sharedCache(size_);
     FrameBuffer* temp1 = cache->ReserveBuffer();
     FrameBuffer* temp2 = cache->ReserveBuffer();
     FrameBuffer* read = src;
@@ -89,7 +89,7 @@ FrameBuffer* FFT::Inverse(FrameBuffer* src) {
     glUniform1i(uniforms_.dimension_location, 0);
     CHECK_GL_ERROR("glUniform1i");
     for (int x_stage = 0; x_stage < log2x_; x_stage++) {
-        Stage(x_stage, 1, read, write);
+        Stage(x_stage, read, write);
         if (read == src) { read = temp2; } // Read from src on the 1st stage
         std::swap(read, write);
     }
@@ -97,7 +97,7 @@ FrameBuffer* FFT::Inverse(FrameBuffer* src) {
     glUniform1i(uniforms_.dimension_location, 1);
     CHECK_GL_ERROR("glUniform1i");
     for (int y_stage = 0; y_stage < log2y_; y_stage++) {
-        Stage(y_stage, 1, read, write);
+        Stage(y_stage, read, write);
         std::swap(read, write);
     }
     cache->RecycleBuffer(write);
@@ -124,7 +124,7 @@ void FFT::GeneratePlanTextures() {
 void FFT::GeneratePlan() {
     const int s = size_.w;
     const int b = log2x_;
-    // Butterflys butterflys: I was really high when I wrote this.
+    // Butterflys butterflys: lol I was super high when I wrote this.
     Butterfly butterfly[s * b];
     int n = 0;
     for (int i = 0; i < b; ++i) {
@@ -151,7 +151,7 @@ void FFT::GeneratePlan() {
                 butterfly[i2].x = j1 / float(s);
                 butterfly[i2].y = j2 / float(s);
 
-            // Compute weights
+                // Compute weights
                 double angle = 2.0*M_PI*k*blocks/static_cast<float>(s);
                 float wr = static_cast<float>( cos(angle));
                 float wi = static_cast<float>(-sin(angle));
@@ -180,10 +180,10 @@ void FFT::GeneratePlan() {
 } 
 
 void FFT::LoadShaders() {
-    Shader * forward_shader = new Shader("minimal", "fft2D_forward_par");
+    Shader* forward_shader = new Shader("minimal", "fft2D_forward_par");
     forward_shader->Init(ShaderAttributes());
     forward_shader_.reset(forward_shader);
-    Shader * inverse_shader = new Shader("minimal", "fft2D_inverse_par");
+    Shader* inverse_shader = new Shader("minimal", "fft2D_inverse_par");
     inverse_shader->Init(ShaderAttributes());
     inverse_shader_.reset(inverse_shader);
     // Forward and inverse shaders share the same uniform locations here
@@ -192,18 +192,15 @@ void FFT::LoadShaders() {
     uniforms_.plan_tex_location = forward_shader->UniformLocation("planTex");
 }
 
-void FFT::Stage(int stage, int inverse, FrameBuffer* src, FrameBuffer* dst) {
+void FFT::Stage(int stage, FrameBuffer* src, FrameBuffer* dst) {
     dst->BindFrameBuffer();
     glViewport(0, 0, size_.w, size_.h);
-
     glActiveTexture (GL_TEXTURE1);
     glBindTexture (GL_TEXTURE_1D, plan_[stage]);
     glUniform1i(uniforms_.plan_tex_location, 1);
-
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, src->texture());
     glUniform1i(uniforms_.state_tex_location, 0);
-     
     VertexArray::Default()->Bind();
     VertexArray::Default()->Draw();    
 }

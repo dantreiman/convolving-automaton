@@ -38,7 +38,7 @@ class FFT {
     void GeneratePlanTextures();
     void GeneratePlan();
     void LoadShaders();
-    void Stage(int stage, int inverse, FrameBuffer* src, FrameBuffer* dst);
+    void Stage(int stage, FrameBuffer* src, FrameBuffer* dst);
     
     Size size_;
     int log2x_;
