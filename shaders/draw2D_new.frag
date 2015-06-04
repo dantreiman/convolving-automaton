@@ -20,9 +20,11 @@ vec3 hsv2rgb(vec3 c)
 
 void main()
 {
-    vec3 hsv = vec3(texture(stateTexture, texcoord).r * 2,
+    float value = texture(stateTexture, texcoord).r;
+    float hue = mod(value * 1.5 + .2, 1.0);
+    vec3 hsv = vec3(hue,
                     1.0,
-                    1.0);
+                    sqrt(value));
     vec3 rgb = hsv2rgb(hsv);
     fragColor = vec4(rgb.r, rgb.g, rgb.b, 1.0);
 }
