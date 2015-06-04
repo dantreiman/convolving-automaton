@@ -13,9 +13,9 @@ FrameBuffer * FrameBufferRing::read_buffer() const {
 }
 
 FrameBuffer * FrameBufferRing::write_buffer() const {
-	auto it = ring_.begin();
-	std::advance(it, 1);
-	return *it;
+    auto it = ring_.begin();
+    std::advance(it, 1);
+    return *it;
 }
 
 void FrameBufferRing::Rotate() {

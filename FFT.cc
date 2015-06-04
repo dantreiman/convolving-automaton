@@ -6,8 +6,6 @@
 #include "log.h"
 #include "VertexArray.h"
 
-#define LOG_FFT_PERFORMANCE 0
-
 namespace {
 
 int bit_reverse(int i, int N) {
@@ -57,25 +55,19 @@ FrameBuffer* FFT::Forward(FrameBuffer* src) {
     FrameBuffer* temp2 = cache->ReserveBuffer();
     FrameBuffer* read = src;
     FrameBuffer* write = temp1;
+    glUseProgram(forward_shader_->program());
+    CHECK_GL_ERROR("glUseProgram");
     for (int x_stage = 0; x_stage < log2x_; x_stage++) {
-#if (LOG_FFT_PERFORMANCE)
-        std::cout << "X stage: from " << read->DebugString() << " to " << write->DebugString() << std::endl;
-#endif
         Stage(0, x_stage, 0, read, write);
         if (read == src) { read = temp2; } // Read from src on the 1st stage
         std::swap(read, write);
     }
     for (int y_stage = 0; y_stage < log2y_; y_stage++) {
-#if (LOG_FFT_PERFORMANCE)
-        std::cout << "Y stage: from " << read->DebugString() << " to " << write->DebugString() << std::endl;
-#endif 
         Stage(1, y_stage, 0, read, write);
         std::swap(read, write);
     }
-#if (LOG_FFT_PERFORMANCE)
-    std::cout << "Returning " << read->DebugString() << " Recycling " << write->DebugString() << std::endl;
-#endif 
     cache->RecycleBuffer(write);
+    glUseProgram(0);
     return read;
 }
 
@@ -85,6 +77,8 @@ FrameBuffer* FFT::Inverse(FrameBuffer* src) {
     FrameBuffer* temp2 = cache->ReserveBuffer();
     FrameBuffer* read = src;
     FrameBuffer* write = temp1;
+    glUseProgram(inverse_shader_->program());
+    CHECK_GL_ERROR("glUseProgram");
     for (int x_stage = 0; x_stage < log2x_; x_stage++) {
         Stage(0, x_stage, 1, read, write);
         if (read == src) { read = temp2; } // Read from src on the 1st stage
@@ -95,6 +89,7 @@ FrameBuffer* FFT::Inverse(FrameBuffer* src) {
         std::swap(read, write);
     }
     cache->RecycleBuffer(write);
+    glUseProgram(0);
     return read;
 }
 
@@ -120,8 +115,7 @@ void FFT::GeneratePlan() {
     // Butterflys butterflys: I was really high when I wrote this.
     Butterfly butterfly[s * b];
     int n = 0;
-    for (int i = 0; i < b; ++i)
-    {
+    for (int i = 0; i < b; ++i) {
         int blocks = 1<<(b - 1 - i);
         int block_inputs = 1<<i;
         for (int j = 0; j < blocks; ++j) {
@@ -159,7 +153,7 @@ void FFT::GeneratePlan() {
         n += s;
     }
     for (int stage = 0; stage < b; stage++) {
-        // Write plan to stdout
+        // Write plan to stdout for debugging
         // if (stage == 1) {
         //  for (int i = 0; i < s; i++) {
         //      Butterfly& b = butterfly[i];
@@ -173,24 +167,22 @@ void FFT::GeneratePlan() {
     }
 } 
 
-
 void FFT::LoadShader() {
-    Shader * shader = new Shader("minimal", "fft2D_par");
-    shader->Init(ShaderAttributes());
-    shader_.reset(shader);
-    uniforms_.dimension_location = shader->UniformLocation("dimension");
-    uniforms_.inverse_location = shader->UniformLocation("inverse");
-    uniforms_.state_tex_location = shader->UniformLocation("stateTex");
-    uniforms_.plan_tex_location = shader->UniformLocation("planTex");
+    Shader * forward_shader = new Shader("minimal", "fft2D_forward_par");
+    forward_shader->Init(ShaderAttributes());
+    forward_shader_.reset(forward_shader);
+    Shader * inverse_shader = new Shader("minimal", "fft2D_inverse_par");
+    inverse_shader->Init(ShaderAttributes());
+    inverse_shader_.reset(inverse_shader);
+    // Forward and inverse shaders share the same uniform locations here
+    uniforms_.dimension_location = forward_shader->UniformLocation("dimension");
+    uniforms_.state_tex_location = forward_shader->UniformLocation("stateTex");
+    uniforms_.plan_tex_location = forward_shader->UniformLocation("planTex");
 }
 
 void FFT::Stage(int dimension, int stage, int inverse, FrameBuffer* src, FrameBuffer* dst) {
     dst->BindFrameBuffer();
     glViewport(0, 0, size_.w, size_.h);
-
-    glUseProgram(shader_->program());
-    CHECK_GL_ERROR("glUseProgram");
-    glUniform1i(uniforms_.inverse_location, inverse);
     glUniform1i(uniforms_.dimension_location, dimension);
     CHECK_GL_ERROR("glUniform1i");
 
@@ -203,9 +195,7 @@ void FFT::Stage(int dimension, int stage, int inverse, FrameBuffer* src, FrameBu
     glUniform1i(uniforms_.state_tex_location, 0);
      
     VertexArray::Default()->Bind();
-    VertexArray::Default()->Draw();
-    
-    glUseProgram(0);
+    VertexArray::Default()->Draw();    
 }
 
 }  // namespace ca

@@ -43,11 +43,11 @@ class FFT {
     Size size_;
     int log2x_;
     int log2y_;
-	GLuint plan_[MP2];
-    std::unique_ptr<Shader> shader_;
+    GLuint plan_[MP2];
+    std::unique_ptr<Shader> forward_shader_;
+    std::unique_ptr<Shader> inverse_shader_;
     struct {
         GLint dimension_location;
-        GLint inverse_location;
         GLint state_tex_location;
         GLint plan_tex_location;
     } uniforms_;

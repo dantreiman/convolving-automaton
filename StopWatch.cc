@@ -19,6 +19,10 @@ void StopWatch::Mark(const std::string description) {
     events_.push_back(Event(high_resolution_clock::now(), description));
 }
 
+double StopWatch::elapsed_time() const {
+    return duration_cast<std::chrono::duration<double>>(high_resolution_clock::now() - start_).count();
+}
+
 std::string StopWatch::Report() {
     high_resolution_clock::time_point last_time = start_;
     high_resolution_clock::time_point end_time = high_resolution_clock::now();

@@ -15,10 +15,12 @@ class StopWatch {
 
     void Start();
     void Mark(const std::string description);
+    double elapsed_time() const;
     std::string Report();
 
  private:
-    typedef std::pair<std::chrono::high_resolution_clock::time_point,std::string> Event;
+    typedef std::chrono::high_resolution_clock::time_point TimePoint;
+    typedef std::pair<TimePoint,std::string> Event;
     
     std::chrono::high_resolution_clock::time_point start_;
     std::string title_;

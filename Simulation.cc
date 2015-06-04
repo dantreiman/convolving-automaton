@@ -109,6 +109,7 @@ void Simulation::TestPerformance() {
     glFlush();
     stop_watch.Mark("fft.Forward x 100");
     std::cout << stop_watch.Report();
+    std::cout << 100.0 / stop_watch.elapsed_time() << " DFTs/sec" << std::endl;
 }
 
 FrameBuffer* Simulation::LockRenderingBuffer() {
