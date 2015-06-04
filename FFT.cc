@@ -57,13 +57,19 @@ FrameBuffer* FFT::Forward(FrameBuffer* src) {
     FrameBuffer* write = temp1;
     glUseProgram(forward_shader_->program());
     CHECK_GL_ERROR("glUseProgram");
+    // Configure shader to work on X dimension
+    glUniform1i(uniforms_.dimension_location, 0);
+    CHECK_GL_ERROR("glUniform1i");
     for (int x_stage = 0; x_stage < log2x_; x_stage++) {
-        Stage(0, x_stage, 0, read, write);
+        Stage(x_stage, 0, read, write);
         if (read == src) { read = temp2; } // Read from src on the 1st stage
         std::swap(read, write);
     }
+    // Configure shader to work on Y dimension
+    glUniform1i(uniforms_.dimension_location, 1);
+    CHECK_GL_ERROR("glUniform1i");
     for (int y_stage = 0; y_stage < log2y_; y_stage++) {
-        Stage(1, y_stage, 0, read, write);
+        Stage(y_stage, 0, read, write);
         std::swap(read, write);
     }
     cache->RecycleBuffer(write);
@@ -79,13 +85,19 @@ FrameBuffer* FFT::Inverse(FrameBuffer* src) {
     FrameBuffer* write = temp1;
     glUseProgram(inverse_shader_->program());
     CHECK_GL_ERROR("glUseProgram");
+    // Configure shader to work on X dimension
+    glUniform1i(uniforms_.dimension_location, 0);
+    CHECK_GL_ERROR("glUniform1i");
     for (int x_stage = 0; x_stage < log2x_; x_stage++) {
-        Stage(0, x_stage, 1, read, write);
+        Stage(x_stage, 1, read, write);
         if (read == src) { read = temp2; } // Read from src on the 1st stage
         std::swap(read, write);
     }
+    // Configure shader to work on Y dimension
+    glUniform1i(uniforms_.dimension_location, 1);
+    CHECK_GL_ERROR("glUniform1i");
     for (int y_stage = 0; y_stage < log2y_; y_stage++) {
-        Stage(1, y_stage, 1, read, write);
+        Stage(y_stage, 1, read, write);
         std::swap(read, write);
     }
     cache->RecycleBuffer(write);
@@ -180,11 +192,9 @@ void FFT::LoadShader() {
     uniforms_.plan_tex_location = forward_shader->UniformLocation("planTex");
 }
 
-void FFT::Stage(int dimension, int stage, int inverse, FrameBuffer* src, FrameBuffer* dst) {
+void FFT::Stage(int stage, int inverse, FrameBuffer* src, FrameBuffer* dst) {
     dst->BindFrameBuffer();
     glViewport(0, 0, size_.w, size_.h);
-    glUniform1i(uniforms_.dimension_location, dimension);
-    CHECK_GL_ERROR("glUniform1i");
 
     glActiveTexture (GL_TEXTURE1);
     glBindTexture (GL_TEXTURE_1D, plan_[stage]);
