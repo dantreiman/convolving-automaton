@@ -31,10 +31,7 @@ void main()
     vec4 input2 = texture(stateTex, newcoord2); 
     vec4 result;
     float imaginary = b.a;
-    result.x = b.b*input2.x - imaginary*input2.y;
-    result.y = imaginary*input2.x + b.b*input2.y;
-    result.z = b.b*input2.z - imaginary*input2.w;
-    result.w = imaginary*input2.z + b.b*input2.w;
-    result += input1;
-    fragColor = result;
+    result.xz = b.b*input2.xz - imaginary*input2.yw;
+    result.yw = imaginary*input2.xz + b.b*input2.yw;
+    fragColor = result + input1;
 }
