@@ -2,6 +2,7 @@
 
 #include "Buffer.h"
 #include "FrameBufferCache.h"
+#include "OpenGLTimer.h"
 #include "Kernel.h"
 #include "log.h"
 #include "StopWatch.h"
@@ -100,12 +101,17 @@ void Simulation::TestPerformance() {
     StopWatch stop_watch("Simulation::Step");
     FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
     FrameBuffer* read = state_ring_.read_buffer();
-    for (int i = 0; i < 100; i++) {
+    OpenGLTimer timer("FFT Breakdown", 10);
+    for (int i = 0; i < 10; i++) {
+        timer.Begin("FFT");
         FrameBuffer* state_fft = fft_.Forward(read);
+        timer.End();
         cache->RecycleBuffer(state_fft);
     }
-    glFlush();
-    stop_watch.Mark("fft.Forward x 100");
+    glFinish();
+    stop_watch.Mark("fft.Forward x 10");
+    timer.WaitForResults();
+    std::cout << timer.Report() << std::endl;
     std::cout << stop_watch.Report();
     std::cout << 100.0 / stop_watch.elapsed_time() << " DFTs/sec" << std::endl;
 }

@@ -5,6 +5,7 @@ LIB_SRCS = Engine.cc \
            FrameBuffer.cc \
            FrameBufferCache.cc \
            FrameBufferRing.cc \
+           OpenGLTimer.cc \
            Kernel.cc \
            Renderer.cc \
            Simulation.cc \
