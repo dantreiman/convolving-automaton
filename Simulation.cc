@@ -98,22 +98,23 @@ void Simulation::Step() {
 }
 
 void Simulation::TestPerformance() {
+    const int iterations = 20;
     StopWatch stop_watch("Simulation::Step");
     FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
     FrameBuffer* read = state_ring_.read_buffer();
-    OpenGLTimer timer("FFT Breakdown", 10);
-    for (int i = 0; i < 10; i++) {
+    OpenGLTimer timer("FFT Breakdown", iterations);
+    for (int i = 0; i < iterations; i++) {
         timer.Begin("FFT");
         FrameBuffer* state_fft = fft_.Forward(read);
         timer.End();
         cache->RecycleBuffer(state_fft);
     }
     glFinish();
-    stop_watch.Mark("fft.Forward x 10");
+    stop_watch.Mark("fft.Forward");
     timer.WaitForResults();
     std::cout << timer.Report() << std::endl;
     std::cout << stop_watch.Report();
-    std::cout << 100.0 / stop_watch.elapsed_time() << " DFTs/sec" << std::endl;
+    std::cout << static_cast<double>(iterations) / stop_watch.elapsed_time() << " DFTs/sec" << std::endl;
 }
 
 FrameBuffer* Simulation::LockRenderingBuffer() {
