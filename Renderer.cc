@@ -45,4 +45,8 @@ void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
     glUseProgram(0);
 }
 
+const Size& Renderer::rtt_size() const {
+    return rtt_size_;
+}
+
 } // namespace ca

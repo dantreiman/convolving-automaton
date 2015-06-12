@@ -10,10 +10,12 @@ using namespace std::placeholders;
 
 namespace ca {
 
-Engine::Engine(const Size& world_size) : window_(NULL),
-                                         monitor_(NULL),
-                                         simulation_(world_size),
-                                         renderer_(world_size, 0) {
+Engine::Engine(const Size& world_size, bool fullscreen) :
+    fullscreen_(fullscreen),
+    window_(NULL),
+    monitor_(NULL),
+    simulation_(world_size),
+    renderer_(world_size, 0) {
 }
 
 void Engine::Init() {
@@ -26,7 +28,9 @@ void Engine::Init() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    int width = 1024, height = 1024;
+    const Size& world_size = renderer_.rtt_size();
+    int width = world_size.w, height = world_size.h;
+
     monitor_ = glfwGetPrimaryMonitor();
     if (monitor_) {
         const GLFWvidmode* mode = glfwGetVideoMode(monitor_);
@@ -34,17 +38,20 @@ void Engine::Init() {
         glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
         glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
         glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-        //width  = mode->width;
-        //height = mode->height;
+        if (fullscreen_) {
+            width  = mode->width;
+            height = mode->height;
+        }
     }
     
-    window_ = glfwCreateWindow(width, height, "ConvolvingAutomaton", NULL, NULL);
+    GLFWmonitor* display_to_capture = fullscreen_ ? monitor_ : NULL;
+    window_ = glfwCreateWindow(width, height, "ConvolvingAutomaton", display_to_capture, NULL);
     if (!window_) {
         fprintf(stderr, "Failed to create GLFW window\n");
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
-    if (monitor_) {
+    if (monitor_ && fullscreen_) {
         glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
     glfwMakeContextCurrent(window_);

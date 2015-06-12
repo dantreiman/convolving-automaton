@@ -6,6 +6,8 @@
 #include "Simulation.h"
 #include "utils.h"
 
+#define FULLSCREEN_MODE 0
+
 namespace ca {
 
 class Engine {
@@ -14,7 +16,7 @@ class Engine {
    * Construct a simulation and renderer for the specified world dimensions.
    * world_size must have power-of-two dimensions.
    */
-  Engine(const Size& world_size);
+  Engine(const Size& world_size, bool fullscreen);
   void Init();
   
   void RunLoop();
@@ -22,6 +24,7 @@ class Engine {
   void TestPerformance();
 
  private:
+  bool fullscreen_;
   GLFWwindow* window_;
   GLFWmonitor* monitor_;
   Simulation simulation_;

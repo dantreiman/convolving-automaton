@@ -9,19 +9,21 @@
 namespace ca {
 
 class Renderer {
- public:
-  Renderer(const Size& rtt_size, GLuint default_framebuffer);
+  public:
+    Renderer(const Size& rtt_size, GLuint default_framebuffer);
   
-  /**
-   * Configure gl state.
-   */
-  void Init();
+    /**
+     * Configure gl state.
+     */
+    void Init();
 
-  void DrawState(GLFWwindow* window, const FrameBuffer* state);
+    void DrawState(GLFWwindow* window, const FrameBuffer* state);
 
-  void Resize(int width, int height);
+    void Resize(int width, int height);
 
- private:
+    const Size& rtt_size() const;
+
+  private:
     Size rtt_size_;
     GLuint default_framebuffer_;
     std::unique_ptr<Shader> draw_shader_;
