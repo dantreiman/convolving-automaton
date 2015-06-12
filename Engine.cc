@@ -26,7 +26,7 @@ void Engine::Init() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    int width = 2880, height = 1800;
+    int width = 1024, height = 1024;
     monitor_ = glfwGetPrimaryMonitor();
     if (monitor_) {
         const GLFWvidmode* mode = glfwGetVideoMode(monitor_);
@@ -34,11 +34,11 @@ void Engine::Init() {
         glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
         glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
         glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-        width  = mode->width;
-        height = mode->height;
+        //width  = mode->width;
+        //height = mode->height;
     }
     
-    window_ = glfwCreateWindow(width, height, "ConvolvingAutomaton", monitor_, NULL);
+    window_ = glfwCreateWindow(width, height, "ConvolvingAutomaton", NULL, NULL);
     if (!window_) {
         fprintf(stderr, "Failed to create GLFW window\n");
         glfwTerminate();
@@ -78,7 +78,6 @@ void Engine::RunLoop() {
         // TODO: run simulation async, lock state buffer when its time to draw.
         simulation_.Step();
         FrameBuffer* state = simulation_.LockRenderingBuffer();
-        //FrameBuffer* state = simulation_.kernels_fft();
         renderer_.DrawState(window_, state);
         simulation_.UnlockRenderingBuffer(state);
         glfwSwapBuffers(window_);

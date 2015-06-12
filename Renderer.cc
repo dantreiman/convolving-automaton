@@ -14,7 +14,7 @@ void Renderer::Init() {
     fprintf(LOGFILE, "Configuring Renderer\n");
     fprintf(LOGFILE, "OpenGL Version: %s\n", glGetString(GL_VERSION));
     fprintf(LOGFILE, "OpenGL Shader Language: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
- // Load default shader
+    // Load default shader
     Shader * draw_shader = new Shader("minimal", "draw2D_new");
     draw_shader->Init(ShaderAttributes());
     draw_shader_.reset(draw_shader);
