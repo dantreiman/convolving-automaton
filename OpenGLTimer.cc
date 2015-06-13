@@ -7,11 +7,13 @@ namespace ca {
 
 OpenGLTimer::OpenGLTimer(const std::string& title, int queries) :
     title_(title), query_count_(queries), current_index_(0) {
+    queries_ = new GLuint[queries];
     glGenQueries(query_count_, queries_);
 }
 
 OpenGLTimer::~OpenGLTimer() {
     glDeleteQueries(query_count_, queries_);
+	delete queries_;
 }
 
 void OpenGLTimer::Begin(const std::string& label) {
@@ -45,7 +47,7 @@ std::string OpenGLTimer::Report() {
         ss << label << " : " << elapsed_time/1000 << " ms" << std::endl;
         total += elapsed_time;
     }
-	ss << "Total elapsed: " << total/1000 << " ms" << std::endl;
+    ss << "Total elapsed: " << total/1000 << " ms" << std::endl;
     return ss.str();
 }
 

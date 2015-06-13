@@ -98,16 +98,18 @@ void Simulation::Step() {
 }
 
 void Simulation::TestPerformance() {
-    const int iterations = 20;
+    const int iterations = 60;
     StopWatch stop_watch("Simulation::Step");
     FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
-    FrameBuffer* read = state_ring_.read_buffer();
     OpenGLTimer timer("FFT Breakdown", iterations);
     for (int i = 0; i < iterations; i++) {
+        FrameBuffer* read = state_ring_.read_buffer();
         timer.Begin("FFT");
         FrameBuffer* state_fft = fft_.Forward(read);
         timer.End();
-        cache->RecycleBuffer(state_fft);
+        cache->RecycleBuffer(state_ring_.RemoveIdle());
+        state_ring_.Add(state_fft);
+        state_ring_.Rotate();
     }
     glFinish();
     stop_watch.Mark("fft.Forward");

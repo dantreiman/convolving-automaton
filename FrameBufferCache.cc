@@ -17,7 +17,7 @@ FrameBufferCache::FrameBufferCache(const Size& rtt_size, int count) : rtt_size_(
 }
 
 FrameBufferCache::~FrameBufferCache() {
-    for ( auto b : buffers_ ) {
+    for (auto b : buffers_) {
         delete b;
     }
     buffers_.clear();
@@ -62,9 +62,9 @@ void FrameBufferCache::GenerateBuffers(int count) {
         if (status != GL_FRAMEBUFFER_COMPLETE) {
             fprintf(LOGFILE, "FramebufferStatus 0x%x\n", status);
         }
-		GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-		glDrawBuffers(1, drawBuffers); // "1" is the size of DrawBuffers
-		CHECK_GL_ERROR("glDrawBuffers");
+        GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+        glDrawBuffers(1, drawBuffers); // "1" is the size of DrawBuffers
+        CHECK_GL_ERROR("glDrawBuffers");
         FrameBuffer * framebuffer = new FrameBuffer(textures[i], framebuffers[i]);
         buffers_.push_back(framebuffer);
     }

@@ -30,7 +30,7 @@ class OpenGLTimer {
  private:
     std::string title_;
     std::vector<std::string> labels_;
-    GLuint queries_[20];
+    GLuint *queries_;
     int query_count_;
     int current_index_;
 };
