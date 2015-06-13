@@ -7,25 +7,23 @@
 in vec2 texcoord;
 out vec4 fragColor;
 
-uniform vec4 colors[4];
+uniform vec4 backgroundColor;
+uniform vec4 color1;
+uniform vec4 color2;
+uniform vec4 color3;
+uniform vec4 color4;
 uniform sampler2D stateTexture;
-
-
-vec3 hsv2rgb(vec3 c)
-{
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-}
-
 
 void main()
 {
+    float colorStop1 = .3;
+    float colorStop2 = .6;
     float value = texture(stateTexture, texcoord).r;
-    float hue = mod(value * value, 1.0);
-    vec3 hsv = vec3(hue,
-                    1.0,
-                    sqrt(value));
-    vec3 rgb = hsv2rgb(hsv);
-    fragColor = vec4(rgb.r, rgb.g, rgb.b, 1.0);
+    vec4 color = backgroundColor;
+    if (value > 0.0) {
+        color = mix(color1, color2, smoothstep(0, colorStop1, value));
+        color = mix(color, color3, smoothstep(colorStop1, colorStop2, value));
+        color = mix(color, color4, smoothstep(colorStop2, 1.0, value));
+    }
+    fragColor = color;
 }
