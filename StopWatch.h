@@ -22,7 +22,7 @@ class StopWatch {
     typedef std::chrono::high_resolution_clock::time_point TimePoint;
     typedef std::pair<TimePoint,std::string> Event;
     
-    std::chrono::high_resolution_clock::time_point start_;
+    TimePoint start_;
     std::string title_;
     std::vector<Event> events_;
 };

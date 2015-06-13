@@ -8,6 +8,8 @@
 #include "utils.h"
 #include "Renderer.h"
 #include "Shader.h"
+#include "SLParameters.h"
+#include "Timer.h"
 
 namespace ca {
 
@@ -61,9 +63,11 @@ class Simulation {
     
     void Convolve(FrameBuffer* output, FrameBuffer* kernels_fft, FrameBuffer* state_fft);
     void Integrate(FrameBuffer* output, FrameBuffer* nm, FrameBuffer* state);
-
+    void UpdateParameters();
+    void Splat(FrameBuffer* output, FrameBuffer* state);
+    
     Size world_size_;
-    std::unique_ptr<FrameBuffer> kernels_fft_;
+    FrameBuffer* kernels_fft_;
     float inner_sum_;
     float outer_sum_;
 
@@ -73,16 +77,8 @@ class Simulation {
     
     std::unique_ptr<Shader> convolve_shader_;
     std::unique_ptr<Shader> sigmoid_shader_;
-    struct {
-        float inner_radius;
-        float outer_radius;
-        float border;
-        float b1, b2;
-        float d1, d2;
-        float alphan;
-        float alpham;
-        float dt;
-    } sl_parameters_;
+    std::unique_ptr<Shader> mix_shader_;
+    SLParameters sl_parameters_;
     struct {
         // convolve_par.frag
         GLint scale_location;
@@ -91,7 +87,12 @@ class Simulation {
         // sigmoid.frag
         GLint integral_tex_location;
         GLint state_tex_location;
+        // mix.frag
+        GLint mix_a_location;
+        GLint mix_b_location;
     } uniforms_;
+    int current_scene_;
+    Timer scene_change_timer_;
 };
 
 }  // namespace ca
