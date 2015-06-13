@@ -23,6 +23,10 @@ class OpenGLTimer {
     void End();
 
     void WaitForResults();
+
+    // Get elapsed time for the specified command group
+	GLuint GetElapsedTime(int index) const;
+
     // Return a complete report of execution times
     // WaitForResults must be called first
     std::string Report();

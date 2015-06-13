@@ -13,7 +13,7 @@ OpenGLTimer::OpenGLTimer(const std::string& title, int queries) :
 
 OpenGLTimer::~OpenGLTimer() {
     glDeleteQueries(query_count_, queries_);
-	delete queries_;
+    delete queries_;
 }
 
 void OpenGLTimer::Begin(const std::string& label) {
@@ -27,6 +27,7 @@ void OpenGLTimer::End() {
 }
 
 void OpenGLTimer::WaitForResults() {
+    if (current_index_ == 0) return;
     GLint ready = 0;
     while (!ready) {
         glGetQueryObjectiv(queries_[current_index_ - 1],
@@ -36,13 +37,21 @@ void OpenGLTimer::WaitForResults() {
     }
 }
 
+GLuint OpenGLTimer::GetElapsedTime(int index) const {
+    if (index < 0 || index >= current_index_) {
+        return 0;
+    }
+    GLuint elapsed_time;
+    glGetQueryObjectuiv(queries_[index], GL_QUERY_RESULT, &elapsed_time);
+    return elapsed_time;
+}
+
 std::string OpenGLTimer::Report() {
     std::stringstream ss;
     GLuint total = 0;
     ss << "OpenGLTimer Report: " << title_ << std::endl;
     for (int i = 0; i < current_index_; i++) {
-        GLuint elapsed_time;
-        glGetQueryObjectuiv(queries_[i], GL_QUERY_RESULT, &elapsed_time);
+        const GLuint elapsed_time = GetElapsedTime(i);
         const std::string& label = labels_[i];
         ss << label << " : " << elapsed_time/1000 << " ms" << std::endl;
         total += elapsed_time;

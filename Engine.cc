@@ -98,6 +98,7 @@ void Engine::RunLoop() {
 
 void Engine::TestPerformance() {
     simulation_.TestPerformance();
+    // simulation_.TestFFTPerformance();
     glfwSwapBuffers(window_);
     glfwDestroyWindow(window_);
     glfwTerminate();

@@ -32,6 +32,11 @@ class Simulation {
     void TestPerformance();
 
     /**
+     * Run FFT benchmarks.
+     */
+    void TestFFTPerformance();
+
+    /**
      * Get a buffer to render the most recent state of the simulation.
      * As soon as rendering is complete, the caller must pass the buffer
      * back into UnlockRenderingBuffer()
@@ -54,6 +59,9 @@ class Simulation {
     void InitKernels();
     void InitState();
     
+    void Convolve(FrameBuffer* output, FrameBuffer* kernels_fft, FrameBuffer* state_fft);
+    void Integrate(FrameBuffer* output, FrameBuffer* nm, FrameBuffer* state);
+
     Size world_size_;
     std::unique_ptr<FrameBuffer> kernels_fft_;
     float inner_sum_;

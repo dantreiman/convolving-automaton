@@ -34,7 +34,7 @@ Simulation::Simulation(const Size& world_size) : world_size_(world_size),
     sl_parameters_.d2 = 0.814;
     sl_parameters_.alphan = 0.028;
     sl_parameters_.alpham = 0.147;
-    sl_parameters_.dt = 0.089;
+    sl_parameters_.dt = 0.1;
 }
 
 void Simulation::Init() {
@@ -46,60 +46,71 @@ void Simulation::Init() {
 }
 
 void Simulation::Step() {
-    // StopWatch stop_watch("Simulation::Step");
     FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
     FrameBuffer* read = state_ring_.read_buffer();
     FrameBuffer* write = state_ring_.write_buffer();
     // Step 1: take fourier transform of the state
     FrameBuffer* state_fft = fft_.Forward(read);
-    // stop_watch.Mark("fft.Forward");
     // Step 2: convolution
-    write->BindFrameBuffer();
-    glViewport(0, 0, world_size_.w, world_size_.h);
-    glUseProgram(convolve_shader_->program());
-    CHECK_GL_ERROR("glUseProgram");
-    // TODO: Premultiply kernels by scale factor
-    glUniform2f(uniforms_.scale_location, 1./inner_sum_, 1./outer_sum_);
-    CHECK_GL_ERROR("glUniform2f");
-    glActiveTexture (GL_TEXTURE1);
-    glBindTexture (GL_TEXTURE_2D, kernels_fft()->texture());
-    glUniform1i(uniforms_.kernels_fft_tex_location, 1);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, state_fft->texture());
-    glUniform1i(uniforms_.state_fft_tex_location, 0);
-    VertexArray::Default()->Bind();
-    VertexArray::Default()->Draw();
+    Convolve(write, kernels_fft_.get(), state_fft);
     cache->RecycleBuffer(state_fft);
-    // stop_watch.Mark("convolve shader");
     // 'write' now contains the products of state with kernels
     // in the frequency domain.
     // Step 3: Parallel inverse fourier transform
     FrameBuffer * nm = fft_.Inverse(write);
-    // stop_watch.Mark("fft.Inverse");
     // Step 4: Compute derivative and apply
-    write->BindFrameBuffer();
-    glViewport(0, 0, world_size_.w, world_size_.h);
-    glUseProgram(sigmoid_shader_->program());
-    CHECK_GL_ERROR("glUseProgram");
-    glActiveTexture (GL_TEXTURE1);
-    glBindTexture (GL_TEXTURE_2D, read->texture());
-    glUniform1i(uniforms_.state_tex_location, 1);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, nm->texture());
-    glUniform1i(uniforms_.integral_tex_location, 0);
-    VertexArray::Default()->Bind();
-    VertexArray::Default()->Draw();
+    Integrate(write, nm, read);
     cache->RecycleBuffer(nm);
-    // stop_watch.Mark("sigmoid shader");
     glUseProgram(0);
     // Done, new state at t+dt is in write buffer.
     state_ring_.Rotate();
-    // std::cout << stop_watch.Report();
 }
 
 void Simulation::TestPerformance() {
-    const int iterations = 60;
+    const int iterations = 5;
     StopWatch stop_watch("Simulation::Step");
+    FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
+    for (int i = 0; i < iterations; i++) {
+        OpenGLTimer timer("Step", iterations);
+        FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
+        FrameBuffer* read = state_ring_.read_buffer();
+        FrameBuffer* write = state_ring_.write_buffer();
+        // Step 1: take fourier transform of the state
+        timer.Begin("FFT");
+        FrameBuffer* state_fft = fft_.Forward(read);
+        timer.End();
+        // Step 2: convolution
+        timer.Begin("Convolve");
+        Convolve(write, kernels_fft_.get(), state_fft);
+        timer.End();
+        cache->RecycleBuffer(state_fft);
+        // 'write' now contains the products of state with kernels
+        // in the frequency domain.
+        // Step 3: Parallel inverse fourier transform
+        timer.Begin("iFFT");
+        FrameBuffer * nm = fft_.Inverse(write);
+        timer.End();
+        // Step 4: Compute derivative and apply
+        timer.Begin("Integrate");
+        Integrate(write, nm, read);
+        timer.End();
+        cache->RecycleBuffer(nm);
+        glUseProgram(0);
+        // Done, new state at t+dt is in write buffer.
+        state_ring_.Rotate();
+        timer.WaitForResults();
+        std::cout << timer.Report() << std::endl;
+    }
+    glFinish();
+    stop_watch.Mark("Completed");
+    std::cout << stop_watch.Report();
+    std::cout << static_cast<double>(iterations) / stop_watch.elapsed_time() << " Steps/sec" << std::endl;
+}
+
+
+void Simulation::TestFFTPerformance() {
+    const int iterations = 60;
+    StopWatch stop_watch("FFT::Forward");
     FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
     OpenGLTimer timer("FFT Breakdown", iterations);
     for (int i = 0; i < iterations; i++) {
@@ -228,5 +239,39 @@ void Simulation::InitState() {
     glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, world_size_.w, world_size_.h, GL_RGBA, GL_FLOAT, state.data());    
     CHECK_GL_ERROR("glTexSubImage2D");
 }
+
+void Simulation::Convolve(FrameBuffer* output, FrameBuffer* kernels_fft, FrameBuffer* state_fft) {
+    output->BindFrameBuffer();
+    glViewport(0, 0, world_size_.w, world_size_.h);
+    glUseProgram(convolve_shader_->program());
+    CHECK_GL_ERROR("glUseProgram");
+    // TODO: Premultiply kernels by scale factor
+    glUniform2f(uniforms_.scale_location, 1./inner_sum_, 1./outer_sum_);
+    CHECK_GL_ERROR("glUniform2f");
+    glActiveTexture (GL_TEXTURE1);
+    glBindTexture (GL_TEXTURE_2D, kernels_fft->texture());
+    glUniform1i(uniforms_.kernels_fft_tex_location, 1);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, state_fft->texture());
+    glUniform1i(uniforms_.state_fft_tex_location, 0);
+    VertexArray::Default()->Bind();
+    VertexArray::Default()->Draw();
+}
+
+void Simulation::Integrate(FrameBuffer* output, FrameBuffer* nm, FrameBuffer* state) {
+    output->BindFrameBuffer();
+    glViewport(0, 0, world_size_.w, world_size_.h);
+    glUseProgram(sigmoid_shader_->program());
+    CHECK_GL_ERROR("glUseProgram");
+    glActiveTexture (GL_TEXTURE1);
+    glBindTexture (GL_TEXTURE_2D, state->texture());
+    glUniform1i(uniforms_.state_tex_location, 1);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, nm->texture());
+    glUniform1i(uniforms_.integral_tex_location, 0);
+    VertexArray::Default()->Bind();
+    VertexArray::Default()->Draw();
+}
+
 
 }  // namespace ca
