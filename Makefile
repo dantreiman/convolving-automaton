@@ -11,7 +11,9 @@ LIB_SRCS = Engine.cc \
            Simulation.cc \
            Shader.cc \
            ShaderAttributes.cc \
+           SLParameters.cc \
            StopWatch.cc \
+           Timer.cc \
            VertexArray.cc \
            glfw-3.1.1/build/src/libglfw3.a
 
