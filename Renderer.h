@@ -27,8 +27,18 @@ class Renderer {
     Size rtt_size_;
     GLuint default_framebuffer_;
     std::unique_ptr<Shader> draw_shader_;
+    std::unique_ptr<Shader> draw_gradient_shader_;
     // uniform locations
     GLint uniform_stateTexture_;
+    // Gradient shader locations
+    struct {
+        GLint background_color_location;
+        GLint color1_location;
+        GLint color2_location;
+        GLint color3_location;
+        GLint color4_location;
+        GLint state_texture_location;
+    } uniforms_;
 };
 
 }  // namespace ca

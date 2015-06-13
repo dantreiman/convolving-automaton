@@ -19,6 +19,16 @@ void Renderer::Init() {
     draw_shader->Init(ShaderAttributes());
     draw_shader_.reset(draw_shader);
     uniform_stateTexture_ = draw_shader_->UniformLocation("stateTexture");
+    // Load gradient shader
+    Shader * draw_gradient_shader = new Shader("minimal", "draw2D_gradient");
+    draw_gradient_shader->Init(ShaderAttributes());
+    draw_gradient_shader_.reset(draw_gradient_shader);
+    uniforms_.background_color_location = draw_gradient_shader_->UniformLocation("backgroundColor");
+    uniforms_.color1_location = draw_gradient_shader_->UniformLocation("color1");
+    uniforms_.color2_location = draw_gradient_shader_->UniformLocation("color2");
+    uniforms_.color3_location = draw_gradient_shader_->UniformLocation("color3");
+    uniforms_.color4_location = draw_gradient_shader_->UniformLocation("color4");
+    uniforms_.state_texture_location = draw_gradient_shader_->UniformLocation("stateTexture");
     // Set up default settings
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
@@ -36,12 +46,21 @@ void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
     glClear(GL_COLOR_BUFFER_BIT);
     CHECK_GL_ERROR("glClear");
 
-    glUseProgram(draw_shader_->program());
+    glUseProgram(draw_gradient_shader_->program());
     CHECK_GL_ERROR("glUseProgram");
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture (GL_TEXTURE_2D, state->texture());
     CHECK_GL_ERROR("glBindTexture");
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glUniform1i(uniforms_.state_texture_location, 0);
+    glUniform4f(uniforms_.background_color_location, 0.0, 0.0, 0.0, 1.0);
+    glUniform4f(uniforms_.color1_location, 33/255.0, 98./255.0, 227/255.0, 1.0);
+    glUniform4f(uniforms_.color2_location, 0.0, 233/255.0, 255/255.0, 1.0);
+    glUniform4f(uniforms_.color3_location, 0.0, 176/255.0, 255/255.0, 1.0);
+    glUniform4f(uniforms_.color4_location, 68/255.0, 0, 242/255.0, 1.0);
     VertexArray::Default()->Bind();
     VertexArray::Default()->Draw();
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glUseProgram(0);
 }
 
