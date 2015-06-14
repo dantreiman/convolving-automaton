@@ -48,21 +48,35 @@ void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
     glClear(GL_COLOR_BUFFER_BIT);
     CHECK_GL_ERROR("glClear");
 
-    glUseProgram(draw_gradient_shader_->program());
-    CHECK_GL_ERROR("glUseProgram");
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture (GL_TEXTURE_2D, state->texture());
-    CHECK_GL_ERROR("glBindTexture");
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glUniform1i(uniforms_.state_texture_location, 0);
-    glUniform4fv(uniforms_.background_color_location, 1, color_scheme_.background_color);
-    glUniform4fv(uniforms_.color1_location, 1, color_scheme_.color1);
-    glUniform4fv(uniforms_.color2_location, 1, color_scheme_.color2);
-    glUniform4fv(uniforms_.color3_location, 1, color_scheme_.color3);
-    glUniform4fv(uniforms_.color4_location, 1, color_scheme_.color4);
-    VertexArray::Default()->Bind();
-    VertexArray::Default()->Draw();
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	if (false) {
+	    glUseProgram(draw_gradient_shader_->program());
+	    CHECK_GL_ERROR("glUseProgram");
+	    glActiveTexture(GL_TEXTURE0);
+	    glBindTexture (GL_TEXTURE_2D, state->texture());
+	    CHECK_GL_ERROR("glBindTexture");
+	    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	    glUniform1i(uniforms_.state_texture_location, 0);
+	    glUniform4fv(uniforms_.background_color_location, 1, color_scheme_.background_color);
+	    glUniform4fv(uniforms_.color1_location, 1, color_scheme_.color1);
+	    glUniform4fv(uniforms_.color2_location, 1, color_scheme_.color2);
+	    glUniform4fv(uniforms_.color3_location, 1, color_scheme_.color3);
+	    glUniform4fv(uniforms_.color4_location, 1, color_scheme_.color4);
+	    VertexArray::Default()->Bind();
+	    VertexArray::Default()->Draw();
+	    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	}
+	else {
+		glUseProgram(draw_shader_->program());
+	    CHECK_GL_ERROR("glUseProgram");
+	    glActiveTexture(GL_TEXTURE0);
+	    glBindTexture (GL_TEXTURE_2D, state->texture());
+	    CHECK_GL_ERROR("glBindTexture");
+	    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	    glUniform1i(uniform_stateTexture_, 0);
+	    VertexArray::Default()->Bind();
+	    VertexArray::Default()->Draw();
+	    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	}
     glUseProgram(0);
 }
 
