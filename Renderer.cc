@@ -8,7 +8,8 @@ namespace ca {
 
 Renderer::Renderer(const Size& rtt_size, GLuint default_framebuffer) :
     rtt_size_(rtt_size),
-    default_framebuffer_(default_framebuffer) {}
+    default_framebuffer_(default_framebuffer),
+    color_scheme_index_(0) {}
 
 void Renderer::Init() {
     fprintf(LOGFILE, "Configuring Renderer\n");
@@ -33,10 +34,18 @@ void Renderer::Init() {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     // Load color scheme
-	color_scheme_ = ColorScheme::GetPreset(2);
+    color_scheme_ = ColorScheme::GetPreset(0);
+    UpdateColors();
+    color_scheme_timer_.Start(20); // seconds
 }
 
 void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
+    if (color_scheme_timer_.IsDone()) {
+        color_scheme_index_ = (color_scheme_index_ + 1) % (ColorScheme::GetPresetCount() + 1);
+        color_scheme_ = ColorScheme::GetPreset(color_scheme_index_);
+        UpdateColors();
+        color_scheme_timer_.Start(20.0); // seconds
+    }
     Size frame_size;
     glBindFramebuffer(GL_FRAMEBUFFER, default_framebuffer_);
     // Resize renderer, since simulation RTT changes viewport
@@ -48,40 +57,45 @@ void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
     glClear(GL_COLOR_BUFFER_BIT);
     CHECK_GL_ERROR("glClear");
 
-	if (false) {
-	    glUseProgram(draw_gradient_shader_->program());
-	    CHECK_GL_ERROR("glUseProgram");
-	    glActiveTexture(GL_TEXTURE0);
-	    glBindTexture (GL_TEXTURE_2D, state->texture());
-	    CHECK_GL_ERROR("glBindTexture");
-	    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	    glUniform1i(uniforms_.state_texture_location, 0);
-	    glUniform4fv(uniforms_.background_color_location, 1, color_scheme_.background_color);
-	    glUniform4fv(uniforms_.color1_location, 1, color_scheme_.color1);
-	    glUniform4fv(uniforms_.color2_location, 1, color_scheme_.color2);
-	    glUniform4fv(uniforms_.color3_location, 1, color_scheme_.color3);
-	    glUniform4fv(uniforms_.color4_location, 1, color_scheme_.color4);
-	    VertexArray::Default()->Bind();
-	    VertexArray::Default()->Draw();
-	    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	}
-	else {
-		glUseProgram(draw_shader_->program());
-	    CHECK_GL_ERROR("glUseProgram");
-	    glActiveTexture(GL_TEXTURE0);
-	    glBindTexture (GL_TEXTURE_2D, state->texture());
-	    CHECK_GL_ERROR("glBindTexture");
-	    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	    glUniform1i(uniform_stateTexture_, 0);
-	    VertexArray::Default()->Bind();
-	    VertexArray::Default()->Draw();
-	    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	}
+    if (color_scheme_index_ < ColorScheme::GetPresetCount()) {
+        glUseProgram(draw_gradient_shader_->program());
+        CHECK_GL_ERROR("glUseProgram");
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture (GL_TEXTURE_2D, state->texture());
+        CHECK_GL_ERROR("glBindTexture");
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glUniform1i(uniforms_.state_texture_location, 0);
+        VertexArray::Default()->Bind();
+        VertexArray::Default()->Draw();
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
+    else {
+        glUseProgram(draw_shader_->program());
+        CHECK_GL_ERROR("glUseProgram");
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture (GL_TEXTURE_2D, state->texture());
+        CHECK_GL_ERROR("glBindTexture");
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glUniform1i(uniform_stateTexture_, 0);
+        VertexArray::Default()->Bind();
+        VertexArray::Default()->Draw();
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
     glUseProgram(0);
 }
 
 const Size& Renderer::rtt_size() const {
     return rtt_size_;
+}
+
+void Renderer::UpdateColors() {
+    glUseProgram(draw_gradient_shader_->program());
+    glUniform4fv(uniforms_.background_color_location, 1, color_scheme_.background_color);
+    glUniform4fv(uniforms_.color1_location, 1, color_scheme_.color1);
+    glUniform4fv(uniforms_.color2_location, 1, color_scheme_.color2);
+    glUniform4fv(uniforms_.color3_location, 1, color_scheme_.color3);
+    glUniform4fv(uniforms_.color4_location, 1, color_scheme_.color4);
+    glUseProgram(0);
 }
 
 } // namespace ca

@@ -4,6 +4,7 @@
 #include "ColorScheme.h"
 #include "FrameBuffer.h"
 #include "gl_includes.h"
+#include "Timer.h"
 #include "Shader.h"
 #include "utils.h"
 
@@ -25,6 +26,8 @@ class Renderer {
     const Size& rtt_size() const;
 
   private:
+	void UpdateColors();
+    
     Size rtt_size_;
     GLuint default_framebuffer_;
     std::unique_ptr<Shader> draw_shader_;
@@ -40,7 +43,9 @@ class Renderer {
         GLint color4_location;
         GLint state_texture_location;
     } uniforms_;
+    int color_scheme_index_;
     ColorScheme color_scheme_;
+	Timer color_scheme_timer_;
 };
 
 }  // namespace ca
