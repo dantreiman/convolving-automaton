@@ -80,7 +80,7 @@ static SLParameters Oscillator = {
     0.574,
     0.082,
     0.147,
-    0.093
+    0.043
 };
 
 int SLParameters::GetPresetCount() {
