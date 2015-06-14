@@ -36,7 +36,7 @@ void Renderer::Init() {
     // Load color scheme
     color_scheme_ = ColorScheme::GetPreset(0);
     UpdateColors();
-    color_scheme_timer_.Start(20); // seconds
+    color_scheme_timer_.Start(140.0); // seconds
 }
 
 void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
@@ -44,7 +44,7 @@ void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
         color_scheme_index_ = (color_scheme_index_ + 1) % (ColorScheme::GetPresetCount() + 1);
         color_scheme_ = ColorScheme::GetPreset(color_scheme_index_);
         UpdateColors();
-        color_scheme_timer_.Start(20.0); // seconds
+        color_scheme_timer_.Start(140.0); // seconds
     }
     Size frame_size;
     glBindFramebuffer(GL_FRAMEBUFFER, default_framebuffer_);

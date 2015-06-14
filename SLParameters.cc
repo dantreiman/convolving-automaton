@@ -44,20 +44,34 @@ static SLParameters ExplodingGliders = {
     0.1
 };
 
+static SLParameters SmoothLifeM = {
+    4.0,
+    12.0,
+    0.0,
+    0.241,
+    0.327,
+    0.358,
+    0.490,
+    0.028,
+    0.147,
+    0.1
+};
 
 int SLParameters::GetPresetCount() {
-    return 3;
+    return 4;
 }
 
 
 SLParameters SLParameters::GetPreset(int preset) {
     switch (preset) {
         case 0:
-        return SmoothLifeL;
+            return SmoothLifeL;
         case 1:
-        return ExplodingGliders;
+            return ExplodingGliders;
         case 2:
-        return Protoplasm;
+            return Protoplasm;
+		case 3:
+            return SmoothLifeM;
     }
     return SmoothLifeL;
 }
