@@ -304,7 +304,7 @@ void Simulation::Splat(FrameBuffer* output, FrameBuffer* state) {
         float v = (float)value_dist(generator_);
         for (int x = xo; x < xo + w; x++) {
             for (int y = yo; y < yo + h; y++) {
-                mix.set(x % world_size_.w, y % world_size_.h, Vec4<float>(v, 0.0, 0.0, 0.0));
+                mix.set(x % world_size_.w, y % world_size_.h, Vec4<float>(v, 1-v, 0.0, 0.0));
             }
         }
     }

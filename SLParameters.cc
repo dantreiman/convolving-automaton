@@ -57,21 +57,34 @@ static SLParameters SmoothLifeM = {
     0.1
 };
 
-static SLParameters AlienStuff = {
-    22 / 3,
-    22,
+static SLParameters Worms = {
+    4.0,
+    12.0,
+    1.0,
+    0.216,
+    0.269,
+    0.284,
+    0.605,
+    0.028,
+    0.147,
+    .1
+};
+
+static SLParameters Oscillator = {
+    14.3/3.0,
+    14.3,
     .3,
-    0.157,
-    0.092,
-    0.106,
-    0.365,
-    0.770,
-    0.047,
-    0.340
-}
+    0.325,
+    0.337,
+    0.305,
+    0.574,
+    0.082,
+    0.147,
+    0.093
+};
 
 int SLParameters::GetPresetCount() {
-    return 5;
+    return 6;
 }
 
 SLParameters SLParameters::GetPreset(int preset) {
@@ -85,7 +98,9 @@ SLParameters SLParameters::GetPreset(int preset) {
         case 3:
             return SmoothLifeM;
         case 4:
-            return AlienStuff;
+            return Worms;
+        case 5:
+            return Oscillator;
     }
     return SmoothLifeL;
 }
