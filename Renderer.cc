@@ -32,6 +32,8 @@ void Renderer::Init() {
     // Set up default settings
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
+    // Load color scheme
+	color_scheme_ = ColorScheme::GetPreset(2);
 }
 
 void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
@@ -53,11 +55,11 @@ void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
     CHECK_GL_ERROR("glBindTexture");
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glUniform1i(uniforms_.state_texture_location, 0);
-    glUniform4f(uniforms_.background_color_location, 0.0, 0.0, 0.0, 1.0);
-    glUniform4f(uniforms_.color1_location, 33/255.0, 98./255.0, 227/255.0, 1.0);
-    glUniform4f(uniforms_.color2_location, 0.0, 233/255.0, 255/255.0, 1.0);
-    glUniform4f(uniforms_.color3_location, 0.0, 176/255.0, 255/255.0, 1.0);
-    glUniform4f(uniforms_.color4_location, 68/255.0, 0, 242/255.0, 1.0);
+    glUniform4fv(uniforms_.background_color_location, 1, color_scheme_.background_color);
+    glUniform4fv(uniforms_.color1_location, 1, color_scheme_.color1);
+    glUniform4fv(uniforms_.color2_location, 1, color_scheme_.color2);
+    glUniform4fv(uniforms_.color3_location, 1, color_scheme_.color3);
+    glUniform4fv(uniforms_.color4_location, 1, color_scheme_.color4);
     VertexArray::Default()->Bind();
     VertexArray::Default()->Draw();
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
