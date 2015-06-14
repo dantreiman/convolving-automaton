@@ -1,6 +1,7 @@
 #ifndef CONVOLVING_AUTOMATON_RENDERER_H_
 #define CONVOLVING_AUTOMATON_RENDERER_H_
 
+#include "ColorScheme.h"
 #include "FrameBuffer.h"
 #include "gl_includes.h"
 #include "Shader.h"
@@ -39,6 +40,7 @@ class Renderer {
         GLint color4_location;
         GLint state_texture_location;
     } uniforms_;
+    ColorScheme color_scheme_;
 };
 
 }  // namespace ca

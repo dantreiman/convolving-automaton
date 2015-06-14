@@ -1,6 +1,7 @@
 CC = /usr/bin/c++
 
-LIB_SRCS = Engine.cc \
+LIB_SRCS = ColorScheme.cc \
+           Engine.cc \
            FFT.cc \
            FrameBuffer.cc \
            FrameBufferCache.cc \
