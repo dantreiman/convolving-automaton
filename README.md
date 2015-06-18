@@ -9,6 +9,7 @@ This project is a fast GPU implementation of "[Generalization of Conway's "Game 
 
 The end goal of this project is to automate the search for cellular automata with certain properties.
 (i.e. symmetries, property 'conservation', gliders, self-replication)
+
 Outline:
 * Provide a fast, GPU-accelerated implementation of the SmoothLife algorithm in 2D.
 * Generalize the algorithm to support any number of dimensions and neighborhood kernels.
@@ -21,7 +22,7 @@ Outline:
 * Mac OSX with developer tools installed
 
 In Terminal:
-make
-./convolving_automaton
+    make
+    ./convolving_automaton
 
 If it doesn't compile, you may have to rebuild glfw for your system.
