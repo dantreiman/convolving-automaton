@@ -17,17 +17,17 @@ uniform sampler2D stateTexture;
 uniform float b1, b2, d1, d2, sn, sm;
 uniform float dt;
 
-float smooth(float x, float a, float ea) {
+float smooth_s(float x, float a, float ea) {
     return 1.0 / (1.0 + exp((a - x) * 4.0 / ea));
 }
 
 float sigmoid_mix(float x, float y, float m) {
-    float sigmoidM = smooth(m, 0.5, sm);
+    float sigmoidM = smooth_s(m, 0.5, sm);
     return x * (1.0 - sigmoidM) + y * sigmoidM;
 }
 
 float sigmoid_ab(float x, float a, float b) {
-    return smooth(x, a, sn) * (1.0 - smooth(x, b, sn));
+    return smooth_s(x, a, sn) * (1.0 - smooth_s(x, b, sn));
 }
 
 float snm(float n, float m) {
