@@ -24,7 +24,8 @@ Project Outline:
 * Mac OSX with developer tools installed
 
 In Terminal:
-	make
-	./convolving_automaton
+
+    make
+    ./convolving_automaton
 
 If it doesn't compile, you may have to rebuild glfw for your system.
