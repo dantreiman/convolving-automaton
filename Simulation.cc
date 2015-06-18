@@ -28,13 +28,13 @@ void Simulation::Init() {
 
 void Simulation::Step() {
     bool splat = false;
-    if (scene_change_timer_.IsDone()) {
-        current_scene_ = (current_scene_ + 1) % SLParameters::GetPresetCount();
-        sl_parameters_ = SLParameters::GetPreset(current_scene_);
-        UpdateParameters();
-        scene_change_timer_.Start(20.0); // seconds
-        splat = true;
-    }
+    // if (scene_change_timer_.IsDone()) {
+    //     current_scene_ = (current_scene_ + 1) % SLParameters::GetPresetCount();
+    //     sl_parameters_ = SLParameters::GetPreset(current_scene_);
+    //     UpdateParameters();
+    //     scene_change_timer_.Start(20.0); // seconds
+    //     splat = true;
+    // }
     
     FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
     FrameBuffer* read = state_ring_.read_buffer();
