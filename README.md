@@ -5,6 +5,8 @@
 ## About
 This project is a fast GPU implementation of "[Generalization of Conway's "Game of Life" to a continuous domain, Rafler 2011](http://arxiv.org/abs/1111.1567)".
 
+To date, it is the fastest implementation due to the parallel DFT.  We compute two DFTs at once by packing two complex meshes into a single texture.  Inspired by [GPU FFT, J.R. Frisvad 2009](http://www2.compute.dtu.dk/pubdb/views/publication_details.php?id=5771).
+
 ## Motivation
 
 The end goal of this project is to automate the search for cellular automata with certain properties.
@@ -18,7 +20,7 @@ Outline:
 
 ## Quickstart
 
-### Requirements
+#### Requirements
 * Mac OSX with developer tools installed
 
 In Terminal:
