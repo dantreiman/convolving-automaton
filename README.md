@@ -24,6 +24,7 @@ Project Outline:
 * Mac OSX with developer tools installed
 
 In Terminal:
+
     make
     ./convolving_automaton
 
