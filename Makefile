@@ -31,6 +31,9 @@ C_FLAGS = -std=c++11 -I glfw-3.1.1/include
 automaton:
 	$(CC) $(MAIN_SRCS) $(C_FLAGS) $(LINKER_FLAGS) $(LINKER_FLAGS_OSX) -o convolving_automaton
 
+yeslife:
+	$(CC) $(MAIN_SRCS) $(C_FLAGS) $(LINKER_FLAGS) $(LINKER_FLAGS_OSX) -o yeslife
+
 perftest:
 	$(CC) $(TEST_PERF_SRCS) $(C_FLAGS) $(LINKER_FLAGS) $(LINKER_FLAGS_OSX) -o perf_test
 
