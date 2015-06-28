@@ -1,11 +1,11 @@
 # ConvolvingAutomaton
 
-![screenshot](https://raw.githubusercontent.com/dantreiman/convolving-automaton/master/screenshots/fullscreen_1.png)
+[![screenshot](https://raw.githubusercontent.com/dantreiman/convolving-automaton/master/screenshots/fullscreen_1.png)](https://www.youtube.com/watch?v=wZWhZQOS9uU)
 
 ## About
 This project is a fast GPU implementation of "[Generalization of Conway's "Game of Life" to a continuous domain, Rafler 2011](http://arxiv.org/abs/1111.1567)".
 
-It is the fastest implementation of SmoothLife to date thanks to the parallel FFT shader inspired by [GPU FFT, J.R. Frisvad 2009](http://www2.compute.dtu.dk/pubdb/views/publication_details.php?id=5771). We can compute two convolutions in parallel by packing two complex meshes into a single GL texture.
+It is the fastest implementation of SmoothLife to date thanks to the parallel FFT shader inspired by [GPU FFT, J.R. Frisvad 2009](http://www2.compute.dtu.dk/pubdb/views/publication_details.php?id=5771).
 
 ## Motivation
 
