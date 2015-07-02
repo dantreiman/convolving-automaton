@@ -7,7 +7,7 @@ This project is a fast GPU implementation of "[Generalization of Conway's "Game 
 
 It is the fastest implementation of SmoothLife to date thanks to the parallel FFT shader inspired by [GPU FFT, J.R. Frisvad 2009](http://www2.compute.dtu.dk/pubdb/views/publication_details.php?id=5771).
 
-For more info about using or contributing, check the [FAQ](https://github.com/dantreiman/convolving-automaton/wiki)!
+For more info about using or contributing, check the [FAQ](https://github.com/dantreiman/convolving-automaton/wiki/FAQ)!
 
 ## Motivation
 
