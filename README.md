@@ -9,6 +9,8 @@ It is the fastest implementation of SmoothLife to date thanks to the parallel FF
 
 For more info about using or contributing, check the [FAQ](https://github.com/dantreiman/convolving-automaton/wiki/FAQ)!
 
+See also: http://sourceforge.net/projects/smoothlife/
+
 ## Motivation
 
 The end goal of this project is to automate the search for cellular automata with certain properties.
