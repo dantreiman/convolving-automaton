@@ -1,6 +1,6 @@
 # ConvolvingAutomaton
 
-[![screenshot](https://raw.githubusercontent.com/dantreiman/convolving-automaton/master/screenshots/fullscreen_1.png)](https://www.youtube.com/watch?v=wZWhZQOS9uU)
+[![screenshot](https://raw.githubusercontent.com/dantreiman/convolving-automaton/master/screenshots/fullscreen_1.png)](https://youtu.be/G3PWcTAb_HM)
 
 ## About
 This project is a fast GPU implementation of "[Generalization of Conway's "Game of Life" to a continuous domain, Rafler 2011](http://arxiv.org/abs/1111.1567)".
