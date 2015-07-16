@@ -1,6 +1,6 @@
 CC = /usr/bin/c++
 
-LIB_SRCS = source/automaton/Kernel.cc \
+LIB_SRCS = source/automaton/KernelGenerator.cc \
            source/fft/FFT.cc \
            source/glfw_frontend/Engine.cc \
            source/glfw_frontend/Renderer.cc \

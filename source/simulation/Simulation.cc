@@ -3,7 +3,7 @@
 #include "Buffer.h"
 #include "FrameBufferCache.h"
 #include "OpenGLTimer.h"
-#include "Kernel.h"
+#include "KernelGenerator.h"
 #include "log.h"
 #include "StopWatch.h"
 #include "Vectors.h"
@@ -176,27 +176,17 @@ void Simulation::LoadShaders() {
 
 void Simulation::InitKernels() {
     // Set up kernels
-    Buffer2D<float> inner_kernel(world_size_);
-    inner_sum_ = CircularKernel(&inner_kernel,
-                                sl_parameters_.inner_radius,
-                                sl_parameters_.border);
-    Buffer2D<float> outer_kernel(world_size_);
-    outer_sum_ = RingKernel(&outer_kernel,
-                             sl_parameters_.inner_radius,
-                             sl_parameters_.outer_radius,
-                            sl_parameters_.border);
     Buffer2D<Vec4<float>> kernels(world_size_);
-    Size half_size = Size(world_size_.w / 2, world_size_.h / 2);
-    for (int x = 0; x < world_size_.w; x++) {
-        for (int y = 0; y < world_size_.h; y++) {
-            // Perform FFT shift
-            const int shift_x = (x + half_size.w) % world_size_.w;
-            const int shift_y = (y + half_size.h) % world_size_.h;
-            // Interleave both kernels using r and b channels of the same image
-            kernels.set(x, y, Vec4<float>(inner_kernel.get(shift_x, shift_y), 0,
-                                          outer_kernel.get(shift_x, shift_y), 0));
-        }
-    }
+    KernelGenerator::MakeCircularKernels(
+        sl_parameters_.inner_radius,
+        Vec2<float>(0,0),
+        sl_parameters_.outer_radius,
+        Vec2<float>(0,0),
+        sl_parameters_.border,
+        &kernels,
+        &inner_sum_,
+        &outer_sum_
+    );
     FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
     FrameBuffer* kernels_buffer = cache->ReserveBuffer();
     glBindTexture(GL_TEXTURE_2D, kernels_buffer->texture());    
