@@ -6,12 +6,12 @@
 namespace ca {
 
 // Returns the sum, writes kernel into buffer
-float CircularKernel(Buffer2D<float> *buffer,
+float CircularKernel(Buffer2D<float>* buffer,
                      float radius,
                      float border);
 
 // Returns the sum, writes kernel into buffer
-float RingKernel(Buffer2D<float> * buffer,
+float RingKernel(Buffer2D<float>* buffer,
                 float inner_radius,
                 float outer_radius,
                 float border);

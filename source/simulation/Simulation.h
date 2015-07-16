@@ -6,7 +6,6 @@
 #include "FrameBufferRing.h"
 #include "gl_includes.h"
 #include "utils.h"
-#include "Renderer.h"
 #include "Shader.h"
 
 namespace ca {
