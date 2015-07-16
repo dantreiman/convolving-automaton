@@ -24,6 +24,7 @@ class Shader {
     const GLint UniformLocation(const GLchar* name);
 
   private:
+    bool Load();
     bool Compile();
     
     std::string vert_src_;

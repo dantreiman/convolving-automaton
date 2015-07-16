@@ -19,7 +19,6 @@ void main()
 }
 )";
 
-
 }  // namespace ca
 
 #endif

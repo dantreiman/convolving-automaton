@@ -53,6 +53,10 @@ bool Shader::Init(const ShaderAttributes& attribute_bindings) {
     // and before linking
     attribute_bindings.Bind(program_);
     
+    if (!Load()) {
+        return false;
+    }
+    
     if (!Compile()) {
         return false;
     }
@@ -65,6 +69,23 @@ const GLuint Shader::program() {
 
 const GLint Shader::UniformLocation(const GLchar* name) {
     return glGetUniformLocation(program(), name);
+}
+
+bool Shader::Load() {
+    vertex_shader_ = glCreateShader (GL_VERTEX_SHADER);
+    CHECK_GL_ERROR("glCreateShader");
+    const char * vert_src_cstring = vert_src_.c_str();
+    glShaderSource(vertex_shader_, 1, &vert_src_cstring, NULL);
+    CHECK_GL_ERROR("glShaderSource");
+    
+    fragment_shader_ = glCreateShader (GL_FRAGMENT_SHADER);
+    CHECK_GL_ERROR("glCreateShader");
+    const char * frag_src_cstring = frag_src_.c_str();
+    glShaderSource(fragment_shader_, 1, &frag_src_cstring, NULL);
+    CHECK_GL_ERROR("glShaderSource");
+   
+    // TODO: error checking
+    return true;
 }
 
 bool Shader::Compile() {
