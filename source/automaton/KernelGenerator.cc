@@ -10,9 +10,80 @@ float func_linear (float x, float a, float b) {
     else return (x - a + b / 2.0) / b;
 }
 
-float CircularKernel(float radius,
+
+class Circle {
+ public:
+    Circle(float radius, float border) : radius_(radius), border_(border) {}
+    
+    float operator () (int x, int y) const {
+        const float d = hypotf(x, y);
+        return 1 - func_linear(d, radius_, border_);
+    }
+
+ private:
+    float radius_;
+    float border_;
+};
+
+
+class Ring {
+ public:
+    Ring(float inner_radius, float outer_radius, float border) :
+        inner_radius_(inner_radius),
+        outer_radius_(outer_radius),
+        border_(border) {}
+    
+    float operator () (int x, int y) const {
+        const float d = hypotf(x, y);
+        return func_linear(d, inner_radius_, border_) * (1 - func_linear(d, outer_radius_, border_));
+    }
+
+ private:
+    float inner_radius_;
+    float outer_radius_;
+    float border_;
+};
+
+
+class Box {
+ public:
+    Box(float radius, float border) : radius_(radius), border_(border) {}
+    
+    float operator () (int x, int y) const {
+		const float d = x+y;
+        return 1 - func_linear(d, radius_, border_);
+    }
+
+ private:
+    float radius_;
+    float border_;
+};
+
+
+class OuterBox {
+ public:
+    OuterBox(float inner_radius, float outer_radius, float border) :
+        inner_radius_(inner_radius),
+        outer_radius_(outer_radius),
+        border_(border) {}
+    
+    float operator () (int x, int y) const {
+        const float d = x+y;
+        return func_linear(d, inner_radius_, border_) * (1 - func_linear(d, outer_radius_, border_));
+    }
+
+ private:
+    float inner_radius_;
+    float outer_radius_;
+    float border_;
+};
+
+
+// Generate a kernel using an arbitrary functor to compute
+// the value at each point
+template <class F>
+float GenerateKernel(F f,
                      ca::Vec2<float> offset,
-                     float border,
                      ca::Buffer2D<float> *buffer) {
     const ca::Size& size = buffer->size();
     const int tx = (size.w / 2) + offset.x;
@@ -20,8 +91,7 @@ float CircularKernel(float radius,
     float sum = 0;
     for (int y = 0; y < size.h; y++) {
         for (int x = 0; x < size.w; x++) {
-            const float d = hypotf(x - tx, y - ty);
-            const float value = 1 - func_linear(d, radius, border);
+            const float value = f(x - tx, y - ty);
             buffer->set(x, y, value);
             sum += value;
         }
@@ -29,47 +99,12 @@ float CircularKernel(float radius,
     return sum;
 }
 
-float RingKernel(float inner_radius,
-                 float outer_radius,
-                 ca::Vec2<float> offset,
-                 float border,
-                 ca::Buffer2D<float> * buffer) {
-    const ca::Size& size = buffer->size();
-    const int tx = size.w / 2 + offset.x;
-    const int ty = size.h / 2 + offset.y;
-    float sum = 0;
-    for (int y = 0; y < size.h; y++) {
-        for (int x = 0; x < size.w; x++) {
-            const float d = hypotf(x - tx, y - ty);
-            const float value = func_linear(d, inner_radius, border) * (1 - func_linear(d, outer_radius, border));
-            buffer->set(x, y, value);
-            sum += value;
-        }
-    }
-    return sum;
-}
 
 }  // namespace
 
 
 namespace ca {
 
-
-void KernelGenerator::MakeCircularKernels(float inner_radius,
-                                          float outer_radius,
-                                          float border,
-                                          Buffer2D<Vec4<float>>* kernel_buffer,
-                                          float* inner_sum,
-                                          float* outer_sum) {
-    MakeCircularKernels(inner_radius,
-                        Vec2<float>(0, 0),
-                        outer_radius,
-                        Vec2<float>(0, 0),
-                        border,
-                        kernel_buffer,
-                        inner_sum,
-                        outer_sum);
-}
 
 void KernelGenerator::MakeCircularKernels(float inner_radius,
                                           Vec2<float> inner_offset,
@@ -81,17 +116,44 @@ void KernelGenerator::MakeCircularKernels(float inner_radius,
                                           float* outer_sum) {
     const Size& world_size = kernel_buffer->size();
     Buffer2D<float> inner_kernel(world_size);
-    *inner_sum = CircularKernel(inner_radius,
+    *inner_sum = GenerateKernel(Circle(inner_radius, border),
                                 inner_offset,
-                                border,
                                 &inner_kernel);
     Buffer2D<float> outer_kernel(world_size);
-    *outer_sum = RingKernel(inner_radius,
-                            outer_radius,
-                            outer_offset,
-                            border,
-                            &outer_kernel);
-    Size half_size = Size(world_size.w / 2, world_size.h / 2);
+    *outer_sum = GenerateKernel(Ring(inner_radius, outer_radius, border),
+                                outer_offset,
+                                &outer_kernel);
+    InterleaveAndShift(inner_kernel, outer_kernel, kernel_buffer);
+}
+
+
+void KernelGenerator::MakeBoxKernels(float inner_radius,
+                                     Vec2<float> inner_offset,
+                                     float outer_radius,
+                                     Vec2<float> outer_offset,
+                                     float border,
+                                     Buffer2D<Vec4<float>>* kernel_buffer,
+                                     float* inner_sum,
+                                     float* outer_sum) {
+    const Size& world_size = kernel_buffer->size();
+    Buffer2D<float> inner_kernel(world_size);
+    *inner_sum = GenerateKernel(Box(inner_radius, border),
+                                inner_offset,
+                                &inner_kernel);
+    Buffer2D<float> outer_kernel(world_size);
+    *outer_sum = GenerateKernel(OuterBox(inner_radius, outer_radius, border),
+                                outer_offset,
+                                &outer_kernel);
+    InterleaveAndShift(inner_kernel, outer_kernel, kernel_buffer);
+	
+}
+
+
+void KernelGenerator::InterleaveAndShift(const Buffer2D<float>& inner_kernel,
+                                         const Buffer2D<float>& outer_kernel,
+                                         Buffer2D<Vec4<float>>* kernel_buffer) {
+    const Size& world_size = kernel_buffer->size();
+    const Size half_size = Size(world_size.w / 2, world_size.h / 2);
     for (int x = 0; x < world_size.w; x++) {
         for (int y = 0; y < world_size.h; y++) {
             // Perform FFT shift

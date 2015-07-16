@@ -17,10 +17,10 @@ template <typename T> class Buffer2D {
     Buffer2D(Buffer2D<T>& other);
     ~Buffer2D();
 
-    const T& get(int x, int y);
+    const T& get(int x, int y) const;
     void set(int x, int y, const T& value);
 
-    const Size& size();
+    const Size& size() const;
     T* data();
   private:
     Size size_;
@@ -41,7 +41,7 @@ template <typename T> Buffer2D<T>::~Buffer2D() {
     free(data_);
 }
 
-template <typename T> const T& Buffer2D<T>::get(int x, int y) {
+template <typename T> const T& Buffer2D<T>::get(int x, int y) const {
     if (x >= size_.w || y >= size_.h) {
         LOG_ERROR("get out of bounds, clamping to edge");
         x = std::max(x, size_.w - 1);
@@ -58,7 +58,7 @@ template <typename T> void Buffer2D<T>::set(int x, int y, const T& value) {
     data_[x + (y * size_.w)] = value;
 }
 
-template <typename T> const Size& Buffer2D<T>::size() {
+template <typename T> const Size& Buffer2D<T>::size() const {
     return size_;
 }
 
