@@ -5,6 +5,8 @@
 #include "FrameBufferCache.h"
 #include "log.h"
 #include "VertexArray.h"
+#include "minimal_vertex_shader.h"
+#include "fft2d_shaders.h"
 
 namespace {
 
@@ -180,10 +182,10 @@ void FFT::GeneratePlan() {
 } 
 
 void FFT::LoadShaders() {
-    Shader* forward_shader = new Shader("minimal", "fft2D_forward_par");
+    Shader* forward_shader = new Shader(minimal_vertex_shader_src, fft2d_forward_parallel_frag_src);
     forward_shader->Init(ShaderAttributes());
     forward_shader_.reset(forward_shader);
-    Shader* inverse_shader = new Shader("minimal", "fft2D_inverse_par");
+    Shader* inverse_shader = new Shader(minimal_vertex_shader_src, fft2d_inverse_parallel_frag_src);
     inverse_shader->Init(ShaderAttributes());
     inverse_shader_.reset(inverse_shader);
     // Forward and inverse shaders share the same uniform locations here

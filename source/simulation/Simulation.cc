@@ -8,6 +8,9 @@
 #include "StopWatch.h"
 #include "Vectors.h"
 #include "VertexArray.h"
+#include "minimal_vertex_shader.h"
+#include "convolve_shader.h"
+#include "sigmoid_shader.h"
 
 namespace ca {
 
@@ -143,14 +146,14 @@ FrameBuffer* Simulation::kernels_fft() const {
 }
 
 void Simulation::LoadShaders() {
-    Shader * convolve_shader = new Shader("minimal", "convolve_par");
+    Shader * convolve_shader = new Shader(minimal_vertex_shader_src, convolve_parallel_frag_src);
     convolve_shader->Init(ShaderAttributes());
     convolve_shader_.reset(convolve_shader);
     uniforms_.scale_location = convolve_shader_->UniformLocation("scale");
     uniforms_.state_fft_tex_location = convolve_shader_->UniformLocation("stateFFT");
     uniforms_.kernels_fft_tex_location = convolve_shader_->UniformLocation("kernelsFFT");
 
-    Shader * sigmoid_shader = new Shader("minimal", "sigmoid");
+    Shader * sigmoid_shader = new Shader(minimal_vertex_shader_src, sigmoid_frag_src);
     sigmoid_shader->Init(ShaderAttributes());
     sigmoid_shader_.reset(sigmoid_shader);
     GLint integral_tex_location;

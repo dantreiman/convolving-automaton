@@ -3,6 +3,8 @@
 #include "gl_includes.h"
 #include "log.h"
 #include "VertexArray.h"
+#include "minimal_vertex_shader.h"
+#include "draw_2d_new_shader.h"
 
 namespace ca {
 
@@ -15,7 +17,7 @@ void Renderer::Init() {
     fprintf(LOGFILE, "OpenGL Version: %s\n", glGetString(GL_VERSION));
     fprintf(LOGFILE, "OpenGL Shader Language: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
     // Load default shader
-    Shader * draw_shader = new Shader("minimal", "draw2D_new");
+    Shader * draw_shader = new Shader(minimal_vertex_shader_src, draw2d_new_frag_src);
     draw_shader->Init(ShaderAttributes());
     draw_shader_.reset(draw_shader);
     uniform_stateTexture_ = draw_shader_->UniformLocation("stateTexture");

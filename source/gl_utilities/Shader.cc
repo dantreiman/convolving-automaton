@@ -2,7 +2,6 @@
 
 #include <string>
 #include <iostream>
-#include <fstream>
 #include <sstream>
 #include <memory>
 #include "log.h"
@@ -44,8 +43,8 @@ bool printProgramInfoLog(GLuint obj)
 
 namespace ca {
 
-Shader::Shader(const std::string& vert_name, const std::string& frag_name) :
-    vert_name_(vert_name), frag_name_(frag_name) {}
+Shader::Shader(const std::string& vert_src, const std::string& frag_src) :
+    vert_src_(vert_src), frag_src_(frag_src) {}
 
 bool Shader::Init(const ShaderAttributes& attribute_bindings) {
     program_ = glCreateProgram();
@@ -53,14 +52,10 @@ bool Shader::Init(const ShaderAttributes& attribute_bindings) {
     // We have to bind shader attributes after program object created,
     // and before linking
     attribute_bindings.Bind(program_);
-    if (!Load()) {
-        return false;
-    }
-
+    
     if (!Compile()) {
         return false;
     }
-
     return true;
 }
 
@@ -70,29 +65,6 @@ const GLuint Shader::program() {
 
 const GLint Shader::UniformLocation(const GLchar* name) {
     return glGetUniformLocation(program(), name);
-}
-
-bool Shader::Load() {
-    std::string vert_path = "shaders/" + vert_name_ + ".vert";
-    std::ifstream vert_file(vert_path);
-    vert_src_ = std::string((std::istreambuf_iterator<char>(vert_file)), std::istreambuf_iterator<char>());
-    vertex_shader_ = glCreateShader (GL_VERTEX_SHADER);
-    CHECK_GL_ERROR("glCreateShader");
-    const char * vert_src_cstring = vert_src_.c_str();
-    glShaderSource(vertex_shader_, 1, &vert_src_cstring, NULL);
-    CHECK_GL_ERROR("glShaderSource");
-    
-    std::string frag_path = "shaders/" + frag_name_ + ".frag";
-    std::ifstream frag_file(frag_path);
-    frag_src_ = std::string((std::istreambuf_iterator<char>(frag_file)), std::istreambuf_iterator<char>());
-    fragment_shader_ = glCreateShader (GL_FRAGMENT_SHADER);
-    CHECK_GL_ERROR("glCreateShader");
-    const char * frag_src_cstring = frag_src_.c_str();
-    glShaderSource(fragment_shader_, 1, &frag_src_cstring, NULL);
-    CHECK_GL_ERROR("glShaderSource");
-   
-    // TODO: error checking
-    return true;
 }
 
 bool Shader::Compile() {
