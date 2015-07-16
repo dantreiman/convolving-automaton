@@ -50,7 +50,7 @@ class Box {
     Box(float radius, float border) : radius_(radius), border_(border) {}
     
     float operator () (int x, int y) const {
-		const float d = x+y;
+        const float d = fmax(abs(x), abs(y));
         return 1 - func_linear(d, radius_, border_);
     }
 
@@ -68,7 +68,7 @@ class OuterBox {
         border_(border) {}
     
     float operator () (int x, int y) const {
-        const float d = x+y;
+        const float d = fmax(abs(x), abs(y));
         return func_linear(d, inner_radius_, border_) * (1 - func_linear(d, outer_radius_, border_));
     }
 
@@ -145,7 +145,7 @@ void KernelGenerator::MakeBoxKernels(float inner_radius,
                                 outer_offset,
                                 &outer_kernel);
     InterleaveAndShift(inner_kernel, outer_kernel, kernel_buffer);
-	
+    
 }
 
 
