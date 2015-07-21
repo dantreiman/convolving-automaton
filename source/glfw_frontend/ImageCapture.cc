@@ -3,7 +3,8 @@
 #include <cstdlib>
 #include <memory>
 
-#include "CImg.h"
+#include "image_includes.h"
+#include "log.h"
 #include "utils.h"
 
 namespace ca {
