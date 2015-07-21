@@ -3,6 +3,7 @@ CC = /usr/bin/c++
 LIB_SRCS = source/automaton/KernelGenerator.cc \
            source/fft/FFT.cc \
            source/glfw_frontend/Engine.cc \
+           source/glfw_frontend/ImageCapture.cc \
            source/glfw_frontend/Renderer.cc \
            source/gl_utilities/FrameBuffer.cc \
            source/gl_utilities/FrameBufferCache.cc \
