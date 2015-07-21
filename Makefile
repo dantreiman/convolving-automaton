@@ -22,7 +22,7 @@ MAIN_SRCS = source/glfw_frontend/main.cc \
 TEST_PERF_SRCS = source/glfw_frontend/profile_main.cc \
                  $(LIB_SRCS)
 
-LINKER_FLAGS = -lc++
+LINKER_FLAGS = -lc++ -lpng16 -lz
 LINKER_FLAGS_OSX = -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
 C_FLAGS = -std=c++11 -I glfw-3.1.1/include -I cimg -I source -I source/utilities -I source/gl_utilities \
 -I source/automaton -I source/simulation -I glfw_frontend -I source/fft
