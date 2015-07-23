@@ -12,9 +12,9 @@ class FrameBuffer {
     GLuint texture() const;
     GLuint framebuffer() const;
     
-	void BindFrameBuffer() const;
-	
-	std::string DebugString() const;
+    void BindFrameBuffer() const;
+    
+    std::string DebugString() const;
  private:
     GLuint texture_;
     GLuint framebuffer_;

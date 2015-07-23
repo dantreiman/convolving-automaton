@@ -52,7 +52,7 @@ void Engine::Init() {
         exit(EXIT_FAILURE);
     }
     if (monitor_ && fullscreen_) {
-        glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     }
     glfwMakeContextCurrent(window_);
     glfwSwapInterval(1);
@@ -80,6 +80,17 @@ void Engine::Init() {
 void Engine::RunLoop() {
     srand ((unsigned)glfwGetTime());
     while (!glfwWindowShouldClose(window_)) {
+        // Paint to screen if button down
+        if (glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+            double x, y;
+            glfwGetCursorPos(window_, &x, &y);
+            // Transform cursor pos to lower-left origin
+            int w, h;
+            glfwGetFramebufferSize(window_, &w, &h);
+            y = y - h;
+            // TODO: paint to screen at touch point
+        }
+        
         //float t = glfwGetTime();
         // For now, simulation and rendering run in same thread
         // TODO: run simulation async, lock state buffer when its time to draw.

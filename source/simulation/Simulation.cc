@@ -110,7 +110,6 @@ void Simulation::TestPerformance() {
     std::cout << static_cast<double>(iterations) / stop_watch.elapsed_time() << " Steps/sec" << std::endl;
 }
 
-
 void Simulation::TestFFTPerformance() {
     const int iterations = 60;
     StopWatch stop_watch("FFT::Forward");

@@ -30,7 +30,7 @@ VertexArray* VertexArray::Default() {
                                0,
                                BUFFER_OFFSET(0));
         CHECK_GL_ERROR("glVertexAttribIPointer");
-		defaultArray = new VertexArray(vao, 4);
+        defaultArray = new VertexArray(vao, 4);
     }
     return defaultArray;
 }

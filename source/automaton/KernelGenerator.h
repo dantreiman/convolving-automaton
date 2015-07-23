@@ -27,6 +27,10 @@ class KernelGenerator {
                                float* inner_sum,
                                float* outer_sum);
 
+    static void MakeCircle(float radius,
+                           float border,
+                           Buffer2D<float>* kernel_buffer);
+
 private:
     static void InterleaveAndShift(const Buffer2D<float>& inner_kernel,
                                    const Buffer2D<float>& outer_kernel,

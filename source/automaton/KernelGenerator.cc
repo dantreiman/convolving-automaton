@@ -149,6 +149,15 @@ void KernelGenerator::MakeBoxKernels(float inner_radius,
 }
 
 
+void KernelGenerator::MakeCircle(float radius,
+                                 float border,
+                                 Buffer2D<float>* kernel_buffer) {
+    GenerateKernel(Circle(radius, border),
+                   Vec2<float>(0, 0),
+                   kernel_buffer);
+}
+
+
 void KernelGenerator::InterleaveAndShift(const Buffer2D<float>& inner_kernel,
                                          const Buffer2D<float>& outer_kernel,
                                          Buffer2D<Vec4<float>>* kernel_buffer) {
