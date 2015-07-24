@@ -3,7 +3,9 @@
 #include <cmath>
 #include <iostream>
 #include <cstdlib>
+#include "Canvas.h"
 #include "FrameBuffer.h"
+#include "FrameBufferCache.h"
 #include "log.h"
 
 using namespace std::placeholders;
@@ -89,6 +91,16 @@ void Engine::RunLoop() {
             glfwGetFramebufferSize(window_, &w, &h);
             y = y - h;
             // TODO: paint to screen at touch point
+            FrameBufferCache* cache = FrameBufferCache::sharedCache(renderer_.rtt_size());
+            FrameBuffer* state = simulation_.RemoveStateBuffer();
+            FrameBuffer* new_state = cache->ReserveBuffer();
+            // paint
+            Canvas canvas(state, new_state);
+            Vec2<float> touch(x, y);
+            canvas.PaintPoints(&touch, 1);
+            cache->RecycleBuffer(state);
+            simulation_.InsertStateBuffer(new_state);
+            
         }
         
         //float t = glfwGetTime();

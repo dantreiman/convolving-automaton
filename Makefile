@@ -11,6 +11,7 @@ LIB_SRCS = source/automaton/KernelGenerator.cc \
            source/gl_utilities/Shader.cc \
            source/gl_utilities/ShaderAttributes.cc \
            source/gl_utilities/VertexArray.cc \
+           source/simulation/Canvas.cc \
            source/simulation/FrameBufferRing.cc \
            source/simulation/Simulation.cc \
            source/utilities/StopWatch.cc \

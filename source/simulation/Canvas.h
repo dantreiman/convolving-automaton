@@ -4,14 +4,15 @@
 #include "FrameBuffer.h"
 #include "gl_includes.h"
 #include "Shader.h"
+#include "Vectors.h"
 
 namespace ca {
 
 class Canvas {
   public:
-    Canvas(FrameBuffer* render_target);
+    Canvas(FrameBuffer* background, FrameBuffer* render_target);
 
-    void PaintPoints(Vec2<float>* points, int count);
+    void PaintPoints(const Vec2<float>* points, int count);
 
   private:
     /**
@@ -24,6 +25,7 @@ class Canvas {
      */
     static GLuint GetDefaultTexture();
     
+    FrameBuffer* background_;
     FrameBuffer* render_target_;
 };
 

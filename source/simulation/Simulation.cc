@@ -140,6 +140,21 @@ void Simulation::UnlockRenderingBuffer(FrameBuffer* rendering_buffer) {
     state_ring_.Add(rendering_buffer);
 }
 
+FrameBuffer* Simulation::RemoveStateBuffer() {
+    // Rotate current state into idle position
+    // Then remove.
+    state_ring_.Rotate();
+    return state_ring_.RemoveIdle();
+}
+
+void Simulation::InsertStateBuffer(FrameBuffer* buffer) {
+    // Add buffer to ring
+    state_ring_.Add(buffer);
+    // Rotate twice to put buffer in read position
+    state_ring_.Rotate();
+    state_ring_.Rotate();
+}
+
 FrameBuffer* Simulation::kernels_fft() const {
     return kernels_fft_.get();
 }

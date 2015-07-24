@@ -1,18 +1,22 @@
 #include "Canvas.h"
 
+#include <memory>
+
 #include "Buffer.h"
 #include "minimal_vertex_shader.h"
 #include "KernelGenerator.h"
 #include "paint_shaders.h"
+#include "Quad.h"
 
 namespace ca {
 
-Canvas::Canvas(FrameBuffer* render_target) render_target_(render_target) {}
+Canvas::Canvas(FrameBuffer* background, FrameBuffer* render_target) :
+    background_(background), render_target_(render_target) {}
 
 void Canvas::PaintPoints(const Vec2<float>* points, int count) {
     const float r = 40;
-    Quad quads[count];
-    for (i = 0; i < count; i++) {
+    Quad* quads = new Quad[count];
+    for (int i = 0; i < count; i++) {
         const Vec2<float>& point = points[i];
         quads[i] = Quad(point.x - r, point.y - r, r*2, r*2);
     }
@@ -38,11 +42,15 @@ void Canvas::PaintPoints(const Vec2<float>* points, int count) {
                            0,
                            BUFFER_OFFSET(0));
     
-    paint_shader->glUseProgram(draw_shader_->program());
+    glUseProgram(GetPaintShader()->program());
     CHECK_GL_ERROR("glUseProgram");
-    glBindTexture (GL_TEXTURE_2D, state->texture());
+    glActiveTexture (GL_TEXTURE1);
+    glBindTexture (GL_TEXTURE_2D, GetDefaultTexture());
     CHECK_GL_ERROR("glBindTexture");
+    glActiveTexture (GL_TEXTURE0);
+    glBindTexture (GL_TEXTURE_2D, background_->texture());
 
+    // bind uniforms
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4 * count);
     CHECK_GL_ERROR("glDrawArrays");
@@ -62,7 +70,7 @@ GLuint Canvas::GetDefaultTexture() {
     GLuint default_texture = 0;
     if (default_texture == 0) {
         const int s = 128;
-        Buffer2D<float> buffer(s, s);
+        Buffer2D<float> buffer(Size(s, s));
         KernelGenerator::MakeCircle(80,
                                     1,
                                     &buffer);
@@ -72,8 +80,8 @@ GLuint Canvas::GetDefaultTexture() {
         CHECK_GL_ERROR("glBindTexture");
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, s, s, 0, GL_ALPHA, GL_FLOAT, buffer.data());
         CHECK_GL_ERROR("glTexImage2D");
     }

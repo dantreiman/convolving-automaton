@@ -49,9 +49,15 @@ class Simulation {
     void UnlockRenderingBuffer(FrameBuffer* rendering_buffer);
 
     /**
-     * Returns a pointer to the next read buffer for the state.  Not thread-safe.
+     * Get the current state buffer.
+     * Used to apply modifications the current state before stepping the simulation.
      */
-    FrameBuffer* state_buffer() const;
+    FrameBuffer* RemoveStateBuffer();
+
+    /**
+     * Insert a buffer as the current state.
+     */
+    void InsertStateBuffer(FrameBuffer* buffer);
 
     /**
      * Returns a pointer to the buffer containing the fourier-transformed kernels.
