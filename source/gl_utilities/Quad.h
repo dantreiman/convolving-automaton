@@ -1,25 +1,29 @@
 #ifndef CONVOLVING_AUTOMATON_QUAD_H_
 #define CONVOLVING_AUTOMATON_QUAD_H_
 
-#include "Vertex.h"
 #include "utils.h"
+#include "Vectors.h"
 
 namespace ca {
 
-struct Quad {
-	Quad() {}
+
+template <typename T> struct Quad {
+    
+    typedef Vec2<T> Vertex;
+    
+    Quad() {}
     Quad(const Size& size) {
-        vertices[0] = Vertex(size.w, 0);
-        vertices[1] = Vertex(size.w, size.h);
-        vertices[2] = Vertex(0, 0);
-        vertices[3] = Vertex(0, size.h);
+        vertices[0] = Vec2<T>(size.w, 0);
+        vertices[1] = Vec2<T>(size.w, size.h);
+        vertices[2] = Vec2<T>(0, 0);
+        vertices[3] = Vec2<T>(0, size.h);
     }
     
-    Quad(float x, float y, float w, float h) {
-        vertices[0] = Vertex(x + w, y);
-        vertices[1] = Vertex(x + w, y + h);
-        vertices[2] = Vertex(x, y);
-        vertices[3] = Vertex(x, y + h);
+    Quad(T x, T y, T w, T h) {
+        vertices[0] = Vec2<T>(x + w, y);
+        vertices[1] = Vec2<T>(x + w, y + h);
+        vertices[2] = Vec2<T>(x, y);
+        vertices[3] = Vec2<T>(x, y + h);
     }
 
     std::string ToString() {
@@ -31,7 +35,7 @@ struct Quad {
         return ss.str();
     }
 
-    Vertex vertices[4];
+    Vec2<T> vertices[4];
 };
 
 }  // namespace ca

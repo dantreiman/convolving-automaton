@@ -29,7 +29,7 @@ class VertexArray {
 
  private:
     GLuint vao_;
-	GLsizei count_;
+    GLsizei count_;
 };
 
 }  // namespace ca

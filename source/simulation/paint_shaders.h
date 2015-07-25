@@ -15,14 +15,12 @@ layout(location = 0) out vec4 fragColor;
 
 in vec2 texcoord;
 
-uniform sampler2D background;
 uniform sampler2D brush;
 
 void main()
 {
-    vec4 background_color = texture(background, texcoord);
-    vec4 brush_color = texture(background, texcoord);
-    fragColor = clamp(background_color + brush_color, 0, 1);
+    vec4 brush_color = texture(brush, texcoord);
+    fragColor =  brush_color;
 }
 )";
 

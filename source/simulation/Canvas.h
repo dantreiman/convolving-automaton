@@ -10,7 +10,7 @@ namespace ca {
 
 class Canvas {
   public:
-    Canvas(FrameBuffer* background, FrameBuffer* render_target);
+    Canvas(FrameBuffer* render_target);
 
     void PaintPoints(const Vec2<float>* points, int count);
 

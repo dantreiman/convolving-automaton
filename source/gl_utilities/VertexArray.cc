@@ -10,7 +10,7 @@ VertexArray* VertexArray::Default() {
     if (defaultArray == NULL) {
         // Create a VAO
         GLuint vao;
-        Quad quad = Quad(-1, -1, 2, 2);
+        Quad<GLint> quad = Quad<GLint>(-1, -1, 2, 2);
         glGenVertexArrays(1, &vao);
         CHECK_GL_ERROR("glGenVertexArrays");
         glBindVertexArray(vao);
@@ -20,7 +20,7 @@ VertexArray* VertexArray::Default() {
         CHECK_GL_ERROR("glGenBuffers");
         glBindBuffer(GL_ARRAY_BUFFER, posBufferName);
         CHECK_GL_ERROR("glBindBuffer");
-        glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), &quad.vertices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Quad<GLint>::Vertex), &quad.vertices[0], GL_STATIC_DRAW);
         CHECK_GL_ERROR("glBufferData");
         glEnableVertexAttribArray(POS_ATTRIB_LOCATION);
         CHECK_GL_ERROR("glEnableVertexAttribArray");
