@@ -18,6 +18,7 @@ Canvas::Canvas(FrameBuffer* render_target) :
     render_target_(render_target) {}
 
 void Canvas::PaintPoints(const Vec2<float>* points, int count) {
+    std::cout << "Point: " << points[0].ToString() << std::endl;
     GetVertexArray(); // ensure vertex array exists
     const float r = .2;
     Quad<float>* quads = new Quad<float>[count];
@@ -25,8 +26,12 @@ void Canvas::PaintPoints(const Vec2<float>* points, int count) {
     for (int i = 0; i < count; i++) {
         const Vec2<float>& point = points[i];
         quads[i] = Quad<float>(point.x - r, point.y - r, r*2, r*2);
-        quads[i] = Quad<float>(.5, .5, r*2, r*2);
     }
+    GetVertexArray()->Bind();
+    glBindBuffer(GL_ARRAY_BUFFER, pos_buffer);
+    CHECK_GL_ERROR("glBindBuffer");
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * count * sizeof(Vec2<float>), &quads[0]);
+    CHECK_GL_ERROR("glBufferSubData");
     delete quads;
     
     render_target_->BindFrameBuffer();
