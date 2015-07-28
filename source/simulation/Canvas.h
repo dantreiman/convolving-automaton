@@ -5,6 +5,9 @@
 #include "gl_includes.h"
 #include "Shader.h"
 #include "Vectors.h"
+#include "VertexArray.h"
+
+#define MAX_POINTS 12
 
 namespace ca {
 
@@ -21,10 +24,16 @@ class Canvas {
     static Shader* GetPaintShader();
     
     /**
-     *
+     * Get the default brush texture.
      */
     static GLuint GetDefaultTexture();
     
+    /**
+     * Get shared reusable vertex array.
+     */
+    static VertexArray* GetVertexArray();
+
+
     FrameBuffer* background_;
     FrameBuffer* render_target_;
 };

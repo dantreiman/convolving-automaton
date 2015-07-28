@@ -24,6 +24,8 @@ class VertexArray {
   VertexArray(GLuint vao, GLsizei count);
   ~VertexArray();
   
+  void SetCount(GLsizei count);
+
   void Bind() const;
   void Draw() const;
 

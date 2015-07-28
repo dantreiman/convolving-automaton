@@ -15,6 +15,7 @@ namespace ca {
 enum {
     // layout(location = 0) in ivec2 position;
     POS_ATTRIB_LOCATION = 0,
+    TEX_ATTRIB_LOCATION = 1
 };
 
 }  // namespace ca

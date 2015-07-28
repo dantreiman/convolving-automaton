@@ -40,7 +40,11 @@ VertexArray::VertexArray(GLuint vao, GLsizei count) :
     count_(count) {}
 
 VertexArray::~VertexArray() {
-    // TODO: Delete vertex array
+    glDeleteVertexArrays(1, &vao_);
+}
+
+void VertexArray::SetCount(GLsizei count) {
+    count_ = count;
 }
 
 void VertexArray::Bind() const {
@@ -49,7 +53,7 @@ void VertexArray::Bind() const {
 }
 
 void VertexArray::Draw() const {
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, count_);
     CHECK_GL_ERROR("glDrawArrays");
 }
 
