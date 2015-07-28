@@ -18,7 +18,6 @@ Canvas::Canvas(FrameBuffer* render_target) :
     render_target_(render_target) {}
 
 void Canvas::PaintPoints(const Vec2<float>* points, int count) {
-    std::cout << "Point: " << points[0].ToString() << std::endl;
     GetVertexArray(); // ensure vertex array exists
     const float r = .2;
     Quad<float>* quads = new Quad<float>[count];
@@ -34,6 +33,8 @@ void Canvas::PaintPoints(const Vec2<float>* points, int count) {
     CHECK_GL_ERROR("glBufferSubData");
     delete quads;
     
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     render_target_->BindFrameBuffer();
     glViewport(0, 0, 512, 512);
     glUseProgram(GetPaintShader()->program());
@@ -52,6 +53,7 @@ void Canvas::PaintPoints(const Vec2<float>* points, int count) {
     GetVertexArray()->Bind();
     GetVertexArray()->Draw();
     //glDisableVertexAttribArray(TEX_ATTRIB_LOCATION);
+    glDisable(GL_BLEND);
 }
 
 
