@@ -6,7 +6,7 @@
 
 namespace ca {
 
-
+// A quad made of two triangles
 template <typename T> struct Quad {
     
     typedef Vec2<T> Vertex;
@@ -16,14 +16,18 @@ template <typename T> struct Quad {
         vertices[0] = Vec2<T>(size.w, 0);
         vertices[1] = Vec2<T>(size.w, size.h);
         vertices[2] = Vec2<T>(0, 0);
-        vertices[3] = Vec2<T>(0, size.h);
+        vertices[3] = Vec2<T>(0, 0);
+        vertices[4] = Vec2<T>(size.w, size.h);
+        vertices[5] = Vec2<T>(0, size.h);
     }
     
     Quad(T x, T y, T w, T h) {
         vertices[0] = Vec2<T>(x + w, y);
         vertices[1] = Vec2<T>(x + w, y + h);
         vertices[2] = Vec2<T>(x, y);
-        vertices[3] = Vec2<T>(x, y + h);
+        vertices[3] = Vec2<T>(x, y);
+        vertices[4] = Vec2<T>(x + w, y + h);
+        vertices[5] = Vec2<T>(x, y + h);
     }
 
     std::string ToString() {
@@ -32,10 +36,12 @@ template <typename T> struct Quad {
         ss << vertices[1].ToString() << "\n";
         ss << vertices[2].ToString() << "\n";
         ss << vertices[3].ToString() << "\n";
+        ss << vertices[4].ToString() << "\n";
+        ss << vertices[5].ToString() << "\n";
         return ss.str();
     }
 
-    Vec2<T> vertices[4];
+    Vec2<T> vertices[6];
 };
 
 }  // namespace ca

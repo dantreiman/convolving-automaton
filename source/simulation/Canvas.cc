@@ -19,7 +19,7 @@ Canvas::Canvas(FrameBuffer* render_target) :
 
 void Canvas::PaintPoints(const Vec2<float>* points, int count) {
     GetVertexArray(); // ensure vertex array exists
-    const float r = .2;
+    const float r = .1;
     Quad<float>* quads = new Quad<float>[count];
     
     for (int i = 0; i < count; i++) {
@@ -29,7 +29,7 @@ void Canvas::PaintPoints(const Vec2<float>* points, int count) {
     GetVertexArray()->Bind();
     glBindBuffer(GL_ARRAY_BUFFER, pos_buffer);
     CHECK_GL_ERROR("glBindBuffer");
-    glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * count * sizeof(Vec2<float>), &quads[0]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 6 * count * sizeof(Vec2<float>), &quads[0]);
     CHECK_GL_ERROR("glBufferSubData");
     delete quads;
     
@@ -43,7 +43,7 @@ void Canvas::PaintPoints(const Vec2<float>* points, int count) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, GetDefaultTexture());
     CHECK_GL_ERROR("glBindTexture");
-    GetVertexArray()->SetCount(count * 4);
+    GetVertexArray()->SetCount(count * 6);
     glEnableVertexAttribArray(POS_ATTRIB_LOCATION);
     CHECK_GL_ERROR("POS_ATTRIB_LOCATION");
     //glEnableVertexAttribArray(TEX_ATTRIB_LOCATION);

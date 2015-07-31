@@ -20,7 +20,7 @@ VertexArray* VertexArray::Default() {
         CHECK_GL_ERROR("glGenBuffers");
         glBindBuffer(GL_ARRAY_BUFFER, posBufferName);
         CHECK_GL_ERROR("glBindBuffer");
-        glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Quad<GLint>::Vertex), &quad.vertices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(Quad<GLint>::Vertex), &quad.vertices[0], GL_STATIC_DRAW);
         CHECK_GL_ERROR("glBufferData");
         glEnableVertexAttribArray(POS_ATTRIB_LOCATION);
         CHECK_GL_ERROR("glEnableVertexAttribArray");
@@ -30,7 +30,7 @@ VertexArray* VertexArray::Default() {
                                0,
                                BUFFER_OFFSET(0));
         CHECK_GL_ERROR("glVertexAttribIPointer");
-        defaultArray = new VertexArray(vao, 4);
+        defaultArray = new VertexArray(vao, 6);
     }
     return defaultArray;
 }
@@ -53,7 +53,7 @@ void VertexArray::Bind() const {
 }
 
 void VertexArray::Draw() const {
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, count_);
+    glDrawArrays(GL_TRIANGLES, 0, count_);
     CHECK_GL_ERROR("glDrawArrays");
 }
 
