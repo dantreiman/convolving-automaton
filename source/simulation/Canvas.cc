@@ -33,8 +33,6 @@ void Canvas::PaintPoints(const Vec2<float>* points, int count) {
     CHECK_GL_ERROR("glBufferSubData");
     delete quads;
     
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     render_target_->BindFrameBuffer();
     glViewport(0, 0, 512, 512);
     glUseProgram(GetPaintShader()->program());
@@ -46,6 +44,8 @@ void Canvas::PaintPoints(const Vec2<float>* points, int count) {
     GetVertexArray()->SetCount(count * 6);
     glEnableVertexAttribArray(POS_ATTRIB_LOCATION);
     CHECK_GL_ERROR("POS_ATTRIB_LOCATION");
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     //glEnableVertexAttribArray(TEX_ATTRIB_LOCATION);
     //CHECK_GL_ERROR("TEX_ATTRIB_LOCATION");
     // VertexArray::Default()->Bind();
@@ -72,7 +72,7 @@ GLuint Canvas::GetDefaultTexture() {
     if (default_texture == 0) {
         const int s = 128;
         Buffer2D<float> buffer(Size(s, s));
-        KernelGenerator::MakeCircle(80,
+        KernelGenerator::MakeCircle(64,
                                     1,
                                     &buffer);
         glGenTextures(1, &default_texture);
@@ -81,8 +81,6 @@ GLuint Canvas::GetDefaultTexture() {
         CHECK_GL_ERROR("glBindTexture");
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA /* color components */, s, s, 0, GL_RED, GL_FLOAT, buffer.data());
         CHECK_GL_ERROR("glTexImage2D");
     }
@@ -95,17 +93,19 @@ VertexArray* Canvas::GetVertexArray() {
     if (vertex_array == NULL) {
         const float r = .2;
         Quad<float>* quads = new Quad<float>[MAX_POINTS];
-        Vec2<float>* texcoords = new Vec2<float>[MAX_POINTS * 4];
+        Vec2<float>* texcoords = new Vec2<float>[MAX_POINTS * 6];
 
         for (int i = 0; i < MAX_POINTS; i++) {
             // init quads to test values
             quads[i] = Quad<float>(.5, .5, .2, .2);
             // init texcoords to correct values
-            const int vi = i * 4;
-            texcoords[vi] = Vec2<float>(0,0);
-            texcoords[vi+1] = Vec2<float>(1,0);
-            texcoords[vi+2] = Vec2<float>(1,1);
-            texcoords[vi+3] = Vec2<float>(0,1);
+            const int vi = i * 6;
+            texcoords[vi] = Vec2<float>(1,0);
+            texcoords[vi+1] = Vec2<float>(1,1);
+            texcoords[vi+2] = Vec2<float>(0,0);
+            texcoords[vi+3] = Vec2<float>(0,0);
+            texcoords[vi+4] = Vec2<float>(1,1);
+            texcoords[vi+5] = Vec2<float>(0,1);
         }
 
         GLuint vao;
@@ -118,7 +118,7 @@ VertexArray* Canvas::GetVertexArray() {
         CHECK_GL_ERROR("glGenBuffers");
         glBindBuffer(GL_ARRAY_BUFFER, pos_buffer);
         CHECK_GL_ERROR("glBindBuffer");
-        glBufferData(GL_ARRAY_BUFFER, 4 * MAX_POINTS * sizeof(Quad<float>::Vertex), &quads[0].vertices[0], GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 6 * MAX_POINTS * sizeof(Quad<float>::Vertex), &quads[0].vertices[0], GL_DYNAMIC_DRAW);
         CHECK_GL_ERROR("glBufferData");
         glEnableVertexAttribArray(POS_ATTRIB_LOCATION);
         CHECK_GL_ERROR("glEnableVertexAttribArray");
@@ -129,14 +129,14 @@ VertexArray* Canvas::GetVertexArray() {
         CHECK_GL_ERROR("glGenBuffers");
         glBindBuffer(GL_ARRAY_BUFFER, tex_buffer);
         CHECK_GL_ERROR("glBindBuffer");
-        glBufferData(GL_ARRAY_BUFFER, 4 * MAX_POINTS * sizeof(Vec2<float>), &texcoords[0], GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 6 * MAX_POINTS * sizeof(Vec2<float>), &texcoords[0], GL_STATIC_DRAW);
         CHECK_GL_ERROR("glBufferData");
         glEnableVertexAttribArray(TEX_ATTRIB_LOCATION);
         CHECK_GL_ERROR("glEnableVertexAttribArray");
         glVertexAttribPointer(TEX_ATTRIB_LOCATION, 2, GL_FLOAT, true, 0, BUFFER_OFFSET(0));
         CHECK_GL_ERROR("glVertexAttribPointer");
 
-        vertex_array = new VertexArray(vao, 4 * MAX_POINTS);
+        vertex_array = new VertexArray(vao, 6 * MAX_POINTS);
         delete quads;
         delete texcoords;
     }

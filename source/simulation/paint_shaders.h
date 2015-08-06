@@ -38,7 +38,7 @@ uniform sampler2D brush;
 void main()
 {
     vec4 brush_color = texture(brush, texcoord);
-    fragColor =  brush_color;
+    fragColor =  vec4(brush_color.r, 0, 0, brush_color.r);
 }
 )";
 
