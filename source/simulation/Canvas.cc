@@ -46,13 +46,8 @@ void Canvas::PaintPoints(const Vec2<float>* points, int count) {
     CHECK_GL_ERROR("POS_ATTRIB_LOCATION");
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glEnableVertexAttribArray(TEX_ATTRIB_LOCATION);
-    //CHECK_GL_ERROR("TEX_ATTRIB_LOCATION");
-    // VertexArray::Default()->Bind();
-    // VertexArray::Default()->Draw();
     GetVertexArray()->Bind();
     GetVertexArray()->Draw();
-    //glDisableVertexAttribArray(TEX_ATTRIB_LOCATION);
     glDisable(GL_BLEND);
 }
 
