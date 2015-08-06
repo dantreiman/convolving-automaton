@@ -4,6 +4,7 @@
 #include "FrameBuffer.h"
 #include "gl_includes.h"
 #include "Shader.h"
+#include "utils.h"
 #include "Vectors.h"
 #include "VertexArray.h"
 
@@ -13,7 +14,7 @@ namespace ca {
 
 class Canvas {
   public:
-    Canvas(FrameBuffer* render_target);
+    Canvas(FrameBuffer* render_target, const Size& size);
 
     void PaintPoints(const Vec2<float>* points, int count);
 
@@ -33,7 +34,7 @@ class Canvas {
      */
     static VertexArray* GetVertexArray();
 
-
+    Size size_;
     FrameBuffer* background_;
     FrameBuffer* render_target_;
 };

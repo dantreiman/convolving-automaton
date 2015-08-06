@@ -14,8 +14,10 @@ static GLuint tex_buffer;
 
 namespace ca {
 
-Canvas::Canvas(FrameBuffer* render_target) :
-    render_target_(render_target) {}
+
+Canvas::Canvas(FrameBuffer* render_target, const Size& size) :
+    render_target_(render_target), size_(size) {}
+
 
 void Canvas::PaintPoints(const Vec2<float>* points, int count) {
     GetVertexArray(); // ensure vertex array exists
@@ -34,7 +36,7 @@ void Canvas::PaintPoints(const Vec2<float>* points, int count) {
     delete quads;
     
     render_target_->BindFrameBuffer();
-    glViewport(0, 0, 512, 512);
+    glViewport(0, 0, size_.w, size_.h);
     glUseProgram(GetPaintShader()->program());
     CHECK_GL_ERROR("glUseProgram");
     glUniform1i(GetPaintShader()->UniformLocation("brush"), 0);

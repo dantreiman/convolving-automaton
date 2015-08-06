@@ -203,9 +203,9 @@ void Simulation::InitKernels() {
     );
     FrameBufferCache* cache = FrameBufferCache::sharedCache(world_size_);
     FrameBuffer* kernels_buffer = cache->ReserveBuffer();
-    glBindTexture(GL_TEXTURE_2D, kernels_buffer->texture());    
+    glBindTexture(GL_TEXTURE_2D, kernels_buffer->texture());
     CHECK_GL_ERROR("glBindTexture");
-    glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, world_size_.w, world_size_.h, GL_RGBA, GL_FLOAT, kernels.data());    
+    glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, world_size_.w, world_size_.h, GL_RGBA, GL_FLOAT, kernels.data());
     CHECK_GL_ERROR("glTexSubImage2D");
     // Compute the DFT of both kernels
     kernels_fft_.reset(fft_.Forward(kernels_buffer));
@@ -241,7 +241,7 @@ void Simulation::InitState() {
             }
         }
     }
-    glBindTexture(GL_TEXTURE_2D, front_buffer->texture());    
+    glBindTexture(GL_TEXTURE_2D, front_buffer->texture());
     CHECK_GL_ERROR("glBindTexture");
     glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0, world_size_.w, world_size_.h, GL_RGBA, GL_FLOAT, state.data());    
     CHECK_GL_ERROR("glTexSubImage2D");

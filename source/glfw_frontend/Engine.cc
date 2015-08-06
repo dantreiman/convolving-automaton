@@ -91,12 +91,11 @@ void Engine::RunLoop() {
             y = h - y;
             // paint
             FrameBuffer* state = simulation_.RemoveStateBuffer();
-            Canvas canvas(state);
+            Canvas canvas(state, renderer_.rtt_size());
             Vec2<float> n(x / w, y / h);  // normalize coordinates to [0,1]
-            Vec2<float> touches[2];
-            touches[0] = Vec2<float>(n.x * 2 - 1, n.y * 2 - 1);  // scale coordinates to [-1,1]
-            touches[1] = Vec2<float>((1.0 - n.x) * 2 - 1, (1.0 - n.y) * 2 - 1);  // scale coordinates to [-1,1]
-            canvas.PaintPoints(touches, 2);
+            Vec2<float> touch;
+            touch = Vec2<float>(n.x * 2 - 1, n.y * 2 - 1);  // scale coordinates to [-1,1]
+            canvas.PaintPoints(&touch, 1);
             simulation_.InsertStateBuffer(state);
         }
         
