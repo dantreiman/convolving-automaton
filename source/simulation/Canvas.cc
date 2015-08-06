@@ -19,9 +19,9 @@ Canvas::Canvas(FrameBuffer* render_target, const Size& size) :
     render_target_(render_target), size_(size) {}
 
 
-void Canvas::PaintPoints(const Vec2<float>* points, int count) {
+void Canvas::PaintPoints(const Vec2<float>* points, int count, float radius) {
     GetVertexArray(); // ensure vertex array exists
-    const float r = .1;
+    const float r = radius / size_.w;
     Quad<float>* quads = new Quad<float>[count];
     
     for (int i = 0; i < count; i++) {

@@ -95,7 +95,7 @@ void Engine::RunLoop() {
             Vec2<float> n(x / w, y / h);  // normalize coordinates to [0,1]
             Vec2<float> touch;
             touch = Vec2<float>(n.x * 2 - 1, n.y * 2 - 1);  // scale coordinates to [-1,1]
-            canvas.PaintPoints(&touch, 1);
+            canvas.PaintPoints(&touch, 1, 20.0);
             simulation_.InsertStateBuffer(state);
         }
         

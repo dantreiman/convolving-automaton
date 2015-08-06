@@ -16,28 +16,29 @@ namespace ca {
 
 Simulation::Simulation(const Size& world_size) : world_size_(world_size),
                                                  fft_(world_size) {
-    // sl_parameters_.inner_radius = 10.0/3.0;
-    // sl_parameters_.outer_radius = 10;
-    // sl_parameters_.border = 1;
-    // sl_parameters_.b1 = 0.257;
-    // sl_parameters_.b2 = 0.336;
-    // sl_parameters_.d1 = 0.365;
-    // sl_parameters_.d2 = 0.549;
-    // sl_parameters_.alphan = 0.028;
-    // sl_parameters_.alpham = 0.147;
-    // sl_parameters_.dt = 0.1;
-    
-    // Protoplasm
+    // SmoothLifeL
     sl_parameters_.inner_radius = 10.0/3.0;
     sl_parameters_.outer_radius = 10;
     sl_parameters_.border = 1;
-    sl_parameters_.b1 = 0.305;
-    sl_parameters_.b2 = 0.443;
-    sl_parameters_.d1 = 0.556;
-    sl_parameters_.d2 = 0.814;
+    sl_parameters_.b1 = 0.257;
+    sl_parameters_.b2 = 0.336;
+    sl_parameters_.d1 = 0.365;
+    sl_parameters_.d2 = 0.549;
     sl_parameters_.alphan = 0.028;
     sl_parameters_.alpham = 0.147;
     sl_parameters_.dt = 0.1;
+    
+    // Protoplasm
+    // sl_parameters_.inner_radius = 10.0/3.0;
+    // sl_parameters_.outer_radius = 10;
+    // sl_parameters_.border = 1;
+    // sl_parameters_.b1 = 0.305;
+    // sl_parameters_.b2 = 0.443;
+    // sl_parameters_.d1 = 0.556;
+    // sl_parameters_.d2 = 0.814;
+    // sl_parameters_.alphan = 0.028;
+    // sl_parameters_.alpham = 0.147;
+    // sl_parameters_.dt = 0.1;
 }
 
 void Simulation::Init() {

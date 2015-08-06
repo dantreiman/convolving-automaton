@@ -16,7 +16,7 @@ class Canvas {
   public:
     Canvas(FrameBuffer* render_target, const Size& size);
 
-    void PaintPoints(const Vec2<float>* points, int count);
+    void PaintPoints(const Vec2<float>* points, int count, float radius);
 
   private:
     /**
