@@ -89,13 +89,12 @@ void Engine::RunLoop() {
             int w, h;
             glfwGetWindowSize(window_, &w, &h);
             y = h - y;
-            // paint
+            // paint onto state buffer
             FrameBuffer* state = simulation_.RemoveStateBuffer();
             Canvas canvas(state, renderer_.rtt_size());
             Vec2<float> n(x / w, y / h);  // normalize coordinates to [0,1]
-            Vec2<float> touch;
-            touch = Vec2<float>(n.x * 2 - 1, n.y * 2 - 1);  // scale coordinates to [-1,1]
-            canvas.PaintPoints(&touch, 1, 20.0);
+            Vec2<float> touch(n.x * 2 - 1, n.y * 2 - 1);  // scale coordinates to [-1,1]
+            canvas.PaintCircles(&touch, 1, 20.0);
             simulation_.InsertStateBuffer(state);
         }
         

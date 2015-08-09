@@ -12,11 +12,15 @@
 
 namespace ca {
 
+// Draws shapes on a texture's image, writing the blended output into
+// another texture.
 class Canvas {
   public:
+    // Initialize the canvas.
     Canvas(FrameBuffer* render_target, const Size& size);
 
-    void PaintPoints(const Vec2<float>* points, int count, float radius);
+    // Paint anti-aliased circles at the positions specified by points.
+    void PaintCircles(const Vec2<float>* points, int count, float radius);
 
   private:
     /**
