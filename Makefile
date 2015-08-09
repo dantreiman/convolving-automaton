@@ -14,6 +14,7 @@ LIB_SRCS = source/automaton/KernelGenerator.cc \
            source/simulation/Canvas.cc \
            source/simulation/FrameBufferRing.cc \
            source/simulation/Simulation.cc \
+           source/simulation/SLParameters.cc \
            source/utilities/StopWatch.cc \
            glfw-3.1.1/build/src/libglfw3.a
 
