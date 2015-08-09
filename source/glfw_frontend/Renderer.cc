@@ -42,8 +42,10 @@ void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
     CHECK_GL_ERROR("glUseProgram");
     glBindTexture (GL_TEXTURE_2D, state->texture());
     CHECK_GL_ERROR("glBindTexture");
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
     VertexArray::Default()->Bind();
     VertexArray::Default()->Draw();
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glUseProgram(0);
 }
 
