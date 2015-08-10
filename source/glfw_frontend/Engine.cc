@@ -52,9 +52,9 @@ void Engine::Init() {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
-    if (monitor_ && fullscreen_) {
-        glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-    }
+    // if (monitor_ && fullscreen_) {
+    //     glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    // }
     glfwMakeContextCurrent(window_);
     glfwSwapInterval(1);
 
