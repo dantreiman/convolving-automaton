@@ -4,7 +4,8 @@
 #include "log.h"
 #include "VertexArray.h"
 #include "minimal_vertex_shader.h"
-#include "draw_2d_new_shader.h"
+#include "draw_2d_hue_shader.h"
+#include "draw_2d_gradient_shader.h"
 
 namespace ca {
 
@@ -17,10 +18,19 @@ void Renderer::Init() {
     fprintf(LOGFILE, "OpenGL Version: %s\n", glGetString(GL_VERSION));
     fprintf(LOGFILE, "OpenGL Shader Language: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
     // Load default shader
-    Shader * draw_shader = new Shader(minimal_vertex_shader_src, draw2d_new_frag_src);
-    draw_shader->Init(ShaderAttributes());
-    draw_shader_.reset(draw_shader);
-    uniform_stateTexture_ = draw_shader_->UniformLocation("stateTexture");
+    Shader * hue_shader = new Shader(minimal_vertex_shader_src, draw2d_hue_frag_src);
+    hue_shader->Init(ShaderAttributes());
+    hue_shader_.reset(hue_shader);
+    hue_uniforms_.state_texture_location = hue_shader_->UniformLocation("stateTexture");
+    Shader * gradient_shader = new Shader(minimal_vertex_shader_src, draw2d_gradient_frag_src);
+    gradient_shader->Init(ShaderAttributes());
+    gradient_shader_.reset(gradient_shader);
+    gradient_uniforms_.background_color_location = gradient_shader_->UniformLocation("backgroundColor");
+    gradient_uniforms_.color1_location = gradient_shader_->UniformLocation("color1");
+    gradient_uniforms_.color2_location = gradient_shader_->UniformLocation("color2");
+    gradient_uniforms_.color3_location = gradient_shader_->UniformLocation("color3");
+    gradient_uniforms_.color4_location = gradient_shader_->UniformLocation("color4");
+    gradient_uniforms_.state_texture_location = gradient_shader_->UniformLocation("stateTexture");
     // Set up default settings
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
@@ -38,7 +48,7 @@ void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
     glClear(GL_COLOR_BUFFER_BIT);
     CHECK_GL_ERROR("glClear");
 
-    glUseProgram(draw_shader_->program());
+    glUseProgram(hue_shader_->program());
     CHECK_GL_ERROR("glUseProgram");
     glBindTexture (GL_TEXTURE_2D, state->texture());
     CHECK_GL_ERROR("glBindTexture");

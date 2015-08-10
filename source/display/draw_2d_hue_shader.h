@@ -5,7 +5,7 @@
 
 namespace ca {
 
-const std::string draw2d_new_frag_src = R"(
+const std::string draw2d_hue_frag_src = R"(
 #version 330 core
 //
 // Draws the state to the screen.
