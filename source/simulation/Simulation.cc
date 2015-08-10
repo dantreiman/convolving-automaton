@@ -16,29 +16,7 @@ namespace ca {
 
 Simulation::Simulation(const Size& world_size) : world_size_(world_size),
                                                  fft_(world_size) {
-    // SmoothLifeL
-    sl_parameters_.inner_radius = 10.0/3.0;
-    sl_parameters_.outer_radius = 10;
-    sl_parameters_.border = 1;
-    sl_parameters_.b1 = 0.257;
-    sl_parameters_.b2 = 0.336;
-    sl_parameters_.d1 = 0.365;
-    sl_parameters_.d2 = 0.549;
-    sl_parameters_.alphan = 0.028;
-    sl_parameters_.alpham = 0.147;
-    sl_parameters_.dt = 0.1;
-    
-    // Protoplasm
-    // sl_parameters_.inner_radius = 10.0/3.0;
-    // sl_parameters_.outer_radius = 10;
-    // sl_parameters_.border = 1;
-    // sl_parameters_.b1 = 0.305;
-    // sl_parameters_.b2 = 0.443;
-    // sl_parameters_.d1 = 0.556;
-    // sl_parameters_.d2 = 0.814;
-    // sl_parameters_.alphan = 0.028;
-    // sl_parameters_.alpham = 0.147;
-    // sl_parameters_.dt = 0.1;
+    sl_parameters_ = SLParameters::GetPreset(0);
 }
 
 void Simulation::Init() {
@@ -175,18 +153,7 @@ void Simulation::LoadShaders() {
     GLint state_tex_location;
     uniforms_.integral_tex_location = sigmoid_shader_->UniformLocation("integralTexture");
     uniforms_.state_tex_location = sigmoid_shader_->UniformLocation("stateTexture");
-    // TODO: make these parameters variable
-    glUseProgram(sigmoid_shader_->program());
-    CHECK_GL_ERROR("glUseProgram");
-    glUniform1f(sigmoid_shader_->UniformLocation("b1"), sl_parameters_.b1);
-    glUniform1f(sigmoid_shader_->UniformLocation("b2"), sl_parameters_.b2);
-    glUniform1f(sigmoid_shader_->UniformLocation("d1"), sl_parameters_.d1);
-    glUniform1f(sigmoid_shader_->UniformLocation("d2"), sl_parameters_.d2);
-    glUniform1f(sigmoid_shader_->UniformLocation("sn"), sl_parameters_.alphan);
-    glUniform1f(sigmoid_shader_->UniformLocation("sm"), sl_parameters_.alpham);
-    glUniform1f(sigmoid_shader_->UniformLocation("dt"), sl_parameters_.dt);
-    CHECK_GL_ERROR("glUniform1f");
-    glUseProgram(0);
+    UpdateParameters();
 }
 
 void Simulation::InitKernels() {
@@ -281,5 +248,19 @@ void Simulation::Integrate(FrameBuffer* output, FrameBuffer* nm, FrameBuffer* st
     VertexArray::Default()->Draw();
 }
 
+void Simulation::UpdateParameters() {
+    // TODO: make these parameters continuously variable
+    glUseProgram(sigmoid_shader_->program());
+    CHECK_GL_ERROR("glUseProgram");
+    glUniform1f(sigmoid_shader_->UniformLocation("b1"), sl_parameters_.b1);
+    glUniform1f(sigmoid_shader_->UniformLocation("b2"), sl_parameters_.b2);
+    glUniform1f(sigmoid_shader_->UniformLocation("d1"), sl_parameters_.d1);
+    glUniform1f(sigmoid_shader_->UniformLocation("d2"), sl_parameters_.d2);
+    glUniform1f(sigmoid_shader_->UniformLocation("sn"), sl_parameters_.alphan);
+    glUniform1f(sigmoid_shader_->UniformLocation("sm"), sl_parameters_.alpham);
+    glUniform1f(sigmoid_shader_->UniformLocation("dt"), sl_parameters_.dt);
+    CHECK_GL_ERROR("glUniform1f");
+    glUseProgram(0);
+}
 
 }  // namespace ca

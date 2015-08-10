@@ -7,6 +7,7 @@
 #include "gl_includes.h"
 #include "utils.h"
 #include "Shader.h"
+#include "SLParameters.h"
 
 namespace ca {
 
@@ -71,6 +72,7 @@ class Simulation {
     
     void Convolve(FrameBuffer* output, FrameBuffer* kernels_fft, FrameBuffer* state_fft);
     void Integrate(FrameBuffer* output, FrameBuffer* nm, FrameBuffer* state);
+    void UpdateParameters();
 
     Size world_size_;
     std::unique_ptr<FrameBuffer> kernels_fft_;
@@ -83,16 +85,7 @@ class Simulation {
     
     std::unique_ptr<Shader> convolve_shader_;
     std::unique_ptr<Shader> sigmoid_shader_;
-    struct {
-        float inner_radius;
-        float outer_radius;
-        float border;
-        float b1, b2;
-        float d1, d2;
-        float alphan;
-        float alpham;
-        float dt;
-    } sl_parameters_;
+    SLParameters sl_parameters_;
     struct {
         // convolve_par.frag
         GLint scale_location;
