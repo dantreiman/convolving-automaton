@@ -32,6 +32,7 @@ void Renderer::Init() {
     gradient_uniforms_.color4_location = gradient_shader_->UniformLocation("color4");
     gradient_uniforms_.state_texture_location = gradient_shader_->UniformLocation("stateTexture");
     // Set up default settings
+    UpdateGradientColors(ColorScheme::GetPreset(0));
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 }
@@ -47,7 +48,16 @@ void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
     glClearColor(0.4f, 0.4f, 1.0f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT);
     CHECK_GL_ERROR("glClear");
+    // DrawHue(state);
+    DrawGradient(state);
+    glUseProgram(0);
+}
 
+const Size& Renderer::rtt_size() const {
+    return rtt_size_;
+}
+
+void Renderer::DrawHue(const FrameBuffer* state) {
     glUseProgram(hue_shader_->program());
     CHECK_GL_ERROR("glUseProgram");
     glBindTexture (GL_TEXTURE_2D, state->texture());
@@ -56,11 +66,29 @@ void Renderer::DrawState(GLFWwindow* window, const FrameBuffer* state) {
     VertexArray::Default()->Bind();
     VertexArray::Default()->Draw();
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glUseProgram(0);
 }
 
-const Size& Renderer::rtt_size() const {
-    return rtt_size_;
+void Renderer::DrawGradient(const FrameBuffer* state) {
+    glUseProgram(gradient_shader_->program());
+    CHECK_GL_ERROR("glUseProgram");
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture (GL_TEXTURE_2D, state->texture());
+    CHECK_GL_ERROR("glBindTexture");
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glUniform1i(gradient_uniforms_.state_texture_location, 0);
+    VertexArray::Default()->Bind();
+    VertexArray::Default()->Draw();
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+}
+
+void Renderer::UpdateGradientColors(const ColorScheme& color_scheme) {
+    glUseProgram(gradient_shader_->program());
+    glUniform4fv(gradient_uniforms_.background_color_location, 1, color_scheme.background_color);
+    glUniform4fv(gradient_uniforms_.color1_location, 1, color_scheme.color1);
+    glUniform4fv(gradient_uniforms_.color2_location, 1, color_scheme.color2);
+    glUniform4fv(gradient_uniforms_.color3_location, 1, color_scheme.color3);
+    glUniform4fv(gradient_uniforms_.color4_location, 1, color_scheme.color4);
+    glUseProgram(0);
 }
 
 } // namespace ca
