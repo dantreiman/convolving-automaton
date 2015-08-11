@@ -1,7 +1,8 @@
 #include "OpenGLTimer.h"
 
 #include <sstream>
-#include <unistd.h>
+#include <chrono>
+#include <thread>
 
 namespace ca {
 
@@ -33,7 +34,7 @@ void OpenGLTimer::WaitForResults() {
         glGetQueryObjectiv(queries_[current_index_ - 1],
                            GL_QUERY_RESULT_AVAILABLE,
                            &ready);
-        sleep(1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 }
 
