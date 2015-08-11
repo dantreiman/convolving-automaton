@@ -1,6 +1,8 @@
 #ifndef CONVOLVING_AUTOMATON_RENDERER_H_
 #define CONVOLVING_AUTOMATON_RENDERER_H_
 
+#include <memory>
+
 #include "ColorScheme.h"
 #include "FrameBuffer.h"
 #include "gl_includes.h"
