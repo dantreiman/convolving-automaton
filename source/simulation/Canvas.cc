@@ -33,7 +33,7 @@ void Canvas::PaintCircles(const Vec2<float>* points, int count, float radius) {
     CHECK_GL_ERROR("glBindBuffer");
     glBufferSubData(GL_ARRAY_BUFFER, 0, 6 * count * sizeof(Vec2<float>), &quads[0]);
     CHECK_GL_ERROR("glBufferSubData");
-    delete quads;
+    delete[] quads;
     
     render_target_->BindFrameBuffer();
     glViewport(0, 0, size_.w, size_.h);
@@ -134,8 +134,8 @@ VertexArray* Canvas::GetVertexArray() {
         CHECK_GL_ERROR("glVertexAttribPointer");
 
         vertex_array = new VertexArray(vao, 6 * MAX_POINTS);
-        delete quads;
-        delete texcoords;
+        delete[] quads;
+        delete[] texcoords;
     }
     return vertex_array;
 }
